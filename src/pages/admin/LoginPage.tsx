@@ -97,9 +97,6 @@ const LoginPage = () => {
           >
             {isLoading ? 'Logging in...' : 'Access Admin Panel'}
           </Button>
-          <p className="text-xs text-muted-foreground text-center">
-            Demo credentials: admin@example.com / admin123
-          </p>
         </CardContent>
       </Card>
     </div>

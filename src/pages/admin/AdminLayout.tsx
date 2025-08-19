@@ -35,12 +35,12 @@ const AdminLayout = () => {
   //   refreshUser();
   // }, [refreshUser]);
 
-  console.log('isAuthenticated.', isAuthenticated);
+  // console.log('isAuthenticated.', isAuthenticated);
   // console.log('user.', user);
   // // Protect admin routes
-  // if (!isAuthenticated) {
-  //   return <Navigate to="/admin-panel/login" replace />;
-  // }
+  if (!isAuthenticated) {
+    return <Navigate to="/admin-panel/login" replace />;
+  }
 
   // Ensure user is admin
   // if (user?.role !== 'admin') {

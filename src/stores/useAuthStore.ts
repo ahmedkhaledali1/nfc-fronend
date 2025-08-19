@@ -103,7 +103,7 @@ const useAuthStore = create<AuthState>()(
       logout: async () => {
         try {
           set({ isLoading: true });
-          await axiosInstance.post('/auth/logout');
+          // await axiosInstance.post('/auth/logout');
           cookies.removeItem('token');
           set({
             user: null,
