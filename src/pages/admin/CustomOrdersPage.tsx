@@ -17,8 +17,10 @@ import {
   MessageSquare,
   Edit,
   Trash2,
+  Eye,
 } from 'lucide-react';
 import EditBulkOrderDialog from './components/EditBulkOrderDialog';
+import ViewCustomOrderDialog from './components/ViewCustomOrderDialog';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 const CustomOrdersPage = () => {
@@ -28,6 +30,7 @@ const CustomOrdersPage = () => {
 
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState<any>(null);
 
@@ -54,6 +57,11 @@ const CustomOrdersPage = () => {
       });
     },
   });
+
+  const handleView = (order: any) => {
+    setSelectedOrder(order);
+    setIsViewDialogOpen(true);
+  };
 
   const handleEdit = (order: any) => {
     setSelectedOrder(order);
@@ -96,9 +104,11 @@ const CustomOrdersPage = () => {
       label: 'Company',
       render: (order: any) => (
         <div>
-          <div className="font-medium">{order.companyInfo.companyName}</div>
+          <div className="font-medium">
+            {order.companyInfo?.companyName || 'N/A'}
+          </div>
           <div className="text-sm text-muted-foreground">
-            {order.companyInfo.contactPerson}
+            {order.companyInfo?.contactPerson || 'N/A'}
           </div>
         </div>
       ),
@@ -108,8 +118,10 @@ const CustomOrdersPage = () => {
       label: 'Contact',
       render: (order: any) => (
         <div className="text-sm">
-          <div>{order.companyInfo.email}</div>
-          <div className="text-muted-foreground">{order.companyInfo.phone}</div>
+          <div>{order.companyInfo?.email || 'N/A'}</div>
+          <div className="text-muted-foreground">
+            {order.companyInfo?.phone || 'N/A'}
+          </div>
         </div>
       ),
     },
@@ -120,7 +132,7 @@ const CustomOrdersPage = () => {
         <div className="flex items-center gap-2">
           <Users className="w-4 h-4 text-muted-foreground" />
           <span className="font-medium">
-            {order.orderDetails.employeeCount}
+            {order.orderDetails?.employeeCount || 0}
           </span>
         </div>
       ),
@@ -156,7 +168,9 @@ const CustomOrdersPage = () => {
       label: 'Created',
       render: (order: any) => (
         <div className="text-sm text-muted-foreground">
-          {new Date(order.createdAt).toLocaleDateString()}
+          {order.createdAt
+            ? new Date(order.createdAt).toLocaleDateString()
+            : 'N/A'}
         </div>
       ),
     },
@@ -168,8 +182,18 @@ const CustomOrdersPage = () => {
           <Button
             variant="outline"
             size="sm"
+            onClick={() => handleView(order)}
+            className="h-8 w-8 p-0"
+            title="View Order"
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => handleEdit(order)}
             className="h-8 w-8 p-0"
+            title="Edit Order"
           >
             <Edit className="h-4 w-4" />
           </Button>
@@ -178,6 +202,7 @@ const CustomOrdersPage = () => {
             size="sm"
             onClick={() => handleDelete(order)}
             className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+            title="Delete Order"
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -203,18 +228,20 @@ const CustomOrdersPage = () => {
       'Estimated Delivery',
     ],
     getRowData: (order: any) => [
-      order._id,
-      order.companyInfo.companyName,
-      order.companyInfo.contactPerson,
-      order.companyInfo.email,
-      order.companyInfo.phone,
-      order.orderDetails.employeeCount.toString(),
-      order.orderDetails.message || '',
-      order.status,
-      order.customPricing.isCustom ? 'Custom' : 'Standard',
-      order.customerResponse.approved ? 'Approved' : 'Pending',
-      new Date(order.createdAt).toLocaleDateString(),
-      new Date(order.estimatedDelivery).toLocaleDateString(),
+      order._id || '',
+      order.companyInfo?.companyName || '',
+      order.companyInfo?.contactPerson || '',
+      order.companyInfo?.email || '',
+      order.companyInfo?.phone || '',
+      order.orderDetails?.employeeCount?.toString() || '0',
+      order.orderDetails?.message || '',
+      order.status || '',
+      order.customPricing?.isCustom ? 'Custom' : 'Standard',
+      order.customerResponse?.approved ? 'Approved' : 'Pending',
+      order.createdAt ? new Date(order.createdAt).toLocaleDateString() : '',
+      order.estimatedDelivery
+        ? new Date(order.estimatedDelivery).toLocaleDateString()
+        : 'N/A',
     ],
   };
 
@@ -250,6 +277,17 @@ const CustomOrdersPage = () => {
           onItemsPerPageChange: handleItemsPerPageChange,
         }}
       />
+
+      {selectedOrder && (
+        <ViewCustomOrderDialog
+          isOpen={isViewDialogOpen}
+          onClose={() => {
+            setIsViewDialogOpen(false);
+            setSelectedOrder(null);
+          }}
+          order={selectedOrder}
+        />
+      )}
 
       {selectedOrder && (
         <EditBulkOrderDialog

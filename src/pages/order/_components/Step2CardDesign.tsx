@@ -15,12 +15,13 @@ function Step2CardDesign() {
         <CustomInput
           name="cardDesign.nameOnCard"
           label="How should your Name appear on the card?"
-          placeholder="Mohammad Rabi or M. R. Mohammad"
+          placeholder="ex: Your Name"
           required={true}
           type="text"
         />
         <p className="text-sm text-muted-foreground mt-1">
-          Examples: "Mohammad Rabi", "M. R. Mohammad", "Dr. Mohammad Rabi"
+          Examples: "Your Name", "Your Name & Position", "Your Name &
+          Organization"
         </p>
       </div>
 
@@ -32,7 +33,7 @@ function Step2CardDesign() {
           options={[
             {
               value: 'black',
-              label: 'Black Matte',
+              label: 'Black',
               description: 'Professional and sleek black finish',
               icon: (
                 <div className="w-6 h-6 bg-black rounded-full border-2 border-border" />
@@ -40,7 +41,7 @@ function Step2CardDesign() {
             },
             {
               value: 'white',
-              label: 'White Glossy',
+              label: 'White',
               description: 'Clean and modern white finish',
               icon: (
                 <div className="w-6 h-6 bg-white rounded-full border-2 border-border" />

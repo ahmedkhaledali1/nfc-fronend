@@ -6,8 +6,9 @@ import PageHeader from './_components/pageHeader';
 import DataTable from '@/components/ui/DataTable';
 import { deleteOrder, getOrders, updateOrder } from '@/lib/service/endpoints';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, Eye } from 'lucide-react';
 import EditOrderDialog from './components/EditOrderDialog';
+import ViewOrderDialog from './components/ViewOrderDialog';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 const OrdersPage = () => {
@@ -65,8 +66,14 @@ const OrdersPage = () => {
 
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState<any>(null);
+
+  const handleView = (order: any) => {
+    setSelectedOrder(order);
+    setIsViewDialogOpen(true);
+  };
 
   const handleEdit = (order: any) => {
     setSelectedOrder(order);
@@ -97,9 +104,9 @@ const OrdersPage = () => {
       label: 'Customer',
       render: (order: any) => (
         <div>
-          <div className="font-medium">{order.customerFullName}</div>
+          <div className="font-medium">{order.customerFullName || 'N/A'}</div>
           <div className="text-sm text-muted-foreground">
-            {order.fullAddress}
+            {order.fullAddress || 'N/A'}
           </div>
         </div>
       ),
@@ -109,9 +116,9 @@ const OrdersPage = () => {
       label: 'Contact',
       render: (order: any) => (
         <div className="text-sm">
-          <div>{order.personalInfo.email}</div>
+          <div>{order.personalInfo?.email || 'N/A'}</div>
           <div className="text-muted-foreground">
-            {order.personalInfo.phoneNumbers[0] || 'No phone'}
+            {order.personalInfo?.phoneNumbers?.[0] || 'No phone'}
           </div>
         </div>
       ),
@@ -121,8 +128,10 @@ const OrdersPage = () => {
       label: 'Product',
       render: (order: any) => (
         <div className="text-sm">
-          <div className="font-medium">{order.product.title}</div>
-          <div className="text-muted-foreground">{order.product.price} JOD</div>
+          <div className="font-medium">{order.product?.title || 'N/A'}</div>
+          <div className="text-muted-foreground">
+            {order.product?.price || 0} JOD
+          </div>
         </div>
       ),
     },
@@ -132,9 +141,9 @@ const OrdersPage = () => {
       render: (order: any) => (
         <div className="space-y-1">
           <Badge variant="outline" className="capitalize">
-            {order.cardDesign.color}
+            {order.cardDesign?.color || 'N/A'}
           </Badge>
-          {order.cardDesign.includePrintedLogo && (
+          {order.cardDesign?.includePrintedLogo && (
             <div className="text-xs text-muted-foreground">With Logo</div>
           )}
         </div>
@@ -179,7 +188,9 @@ const OrdersPage = () => {
       label: 'Date',
       render: (order: any) => (
         <div className="text-sm text-muted-foreground">
-          {new Date(order.createdAt).toLocaleDateString()}
+          {order.createdAt
+            ? new Date(order.createdAt).toLocaleDateString()
+            : 'N/A'}
         </div>
       ),
     },
@@ -193,8 +204,18 @@ const OrdersPage = () => {
             <Button
               variant="outline"
               size="sm"
+              onClick={() => handleView(order)}
+              className="h-8 w-8 p-0"
+              title="View Order"
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => handleEdit(order)}
               className="h-8 w-8 p-0"
+              title="Edit Order"
             >
               <Edit className="h-4 w-4" />
             </Button>
@@ -203,6 +224,7 @@ const OrdersPage = () => {
               size="sm"
               onClick={() => handleDelete(order)}
               className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+              title="Delete Order"
             >
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -228,17 +250,17 @@ const OrdersPage = () => {
       'Date',
     ],
     getRowData: (order: any) => [
-      order._id,
-      order.customerFullName,
-      order.personalInfo.email,
-      order.personalInfo.phoneNumbers[0] || '',
-      order.product.title,
-      order.cardDesign.color,
-      order.fullAddress,
-      order.status,
-      order.paymentMethod,
-      order.total,
-      new Date(order.createdAt).toLocaleDateString(),
+      order._id || '',
+      order.customerFullName || '',
+      order.personalInfo?.email || '',
+      order.personalInfo?.phoneNumbers?.[0] || '',
+      order.product?.title || '',
+      order.cardDesign?.color || '',
+      order.fullAddress || '',
+      order.status || '',
+      order.paymentMethod || '',
+      order.total || 0,
+      order.createdAt ? new Date(order.createdAt).toLocaleDateString() : '',
     ],
   };
 
@@ -272,6 +294,17 @@ const OrdersPage = () => {
           onItemsPerPageChange: handleItemsPerPageChange,
         }}
       />
+
+      {selectedOrder && (
+        <ViewOrderDialog
+          isOpen={isViewDialogOpen}
+          onClose={() => {
+            setIsViewDialogOpen(false);
+            setSelectedOrder(null);
+          }}
+          order={selectedOrder}
+        />
+      )}
 
       {selectedOrder && (
         <EditOrderDialog

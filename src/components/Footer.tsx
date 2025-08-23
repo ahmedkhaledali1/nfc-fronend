@@ -1,10 +1,47 @@
-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Zap, Linkedin, Instagram, MessageCircle } from 'lucide-react';
+import {
+  Zap,
+  Linkedin,
+  Instagram,
+  MessageCircle,
+  Facebook,
+  Twitter,
+  Youtube,
+  MessageSquare,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { getSocialMedia } from '@/lib/service/endpoints';
 
 const Footer = () => {
+  const { data: socialMediaData } = useQuery({
+    queryKey: ['getSocialMedia'],
+    queryFn: () => getSocialMedia(),
+  });
+
+  const socialMediaItems = socialMediaData?.data?.data?.data || [];
+
+  const getPlatformIcon = (platformIcon: string) => {
+    const platformLower = platformIcon.toLowerCase();
+    switch (platformLower) {
+      case 'facebook':
+        return <Facebook className="w-5 h-5" />;
+      case 'instagram':
+        return <Instagram className="w-5 h-5" />;
+      case 'whatsapp':
+        return <MessageSquare className="w-5 h-5" />;
+      case 'linkedin':
+        return <Linkedin className="w-5 h-5" />;
+      case 'twitter':
+        return <Twitter className="w-5 h-5" />;
+      case 'youtube':
+        return <Youtube className="w-5 h-5" />;
+      default:
+        return <MessageCircle className="w-5 h-5" />;
+    }
+  };
+
   const quickLinks = [
     { name: 'How It Works', href: '#how-it-works' },
     { name: 'Features', href: '#features' },
@@ -28,32 +65,41 @@ const Footer = () => {
           {/* Company Info */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <img 
-                src="/lovable-uploads/296ec74b-2fbc-4a64-b1a2-e2c9d33b0168.png" 
-                alt="LinkIt" 
+              <img
+                src="/lovable-uploads/296ec74b-2fbc-4a64-b1a2-e2c9d33b0168.png"
+                alt="LinkIt"
                 className="h-16 w-auto"
               />
             </div>
             <p className="text-muted-foreground leading-relaxed">
-              Revolutionizing professional networking with premium NFC technology. 
-              Share your details instantly, build connections effortlessly.
+              Revolutionizing professional networking with premium NFC
+              technology. Share your details instantly, build connections
+              effortlessly.
             </p>
             <div className="flex space-x-4">
-              <Button variant="ghost" size="sm" className="p-2">
-                <Linkedin className="w-5 h-5" />
-              </Button>
-              <Button variant="ghost" size="sm" className="p-2">
-                <Instagram className="w-5 h-5" />
-              </Button>
-              <Button variant="ghost" size="sm" className="p-2">
-                <MessageCircle className="w-5 h-5" />
-              </Button>
+              {socialMediaItems
+                .filter((item: any) => item.isActive)
+                .sort((a: any, b: any) => a.displayOrder - b.displayOrder)
+                .map((item: any) => (
+                  <a
+                    key={item._id}
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+                    title={item.platformDisplayName}
+                  >
+                    {getPlatformIcon(item.platformIcon)}
+                  </a>
+                ))}
             </div>
           </div>
 
           {/* Quick Links */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-foreground">Quick Links</h3>
+            <h3 className="text-lg font-semibold text-foreground">
+              Quick Links
+            </h3>
             <nav className="space-y-2">
               {quickLinks.map((link) => (
                 <button
@@ -79,19 +125,19 @@ const Footer = () => {
 
           {/* Newsletter */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-foreground">Stay Updated</h3>
+            <h3 className="text-lg font-semibold text-foreground">
+              Stay Updated
+            </h3>
             <p className="text-muted-foreground text-sm">
               Get the latest updates on new features and exclusive offers.
             </p>
             <div className="flex space-x-2">
-              <Input 
-                type="email" 
+              <Input
+                type="email"
                 placeholder="Enter your email"
                 className="flex-1"
               />
-              <Button className="btn-hero">
-                Subscribe
-              </Button>
+              <Button className="btn-hero">Subscribe</Button>
             </div>
           </div>
         </div>
@@ -101,17 +147,26 @@ const Footer = () => {
           <div className="text-muted-foreground text-sm">
             © 2025 LinkIt Cards. All rights reserved.
           </div>
-          
+
           <div className="flex space-x-6 text-sm text-muted-foreground">
-            <Link to="/bulk-orders" className="hover:text-foreground transition-colors">
+            <Link
+              to="/bulk-orders"
+              className="hover:text-foreground transition-colors"
+            >
               Bulk Orders
             </Link>
-            <button className="hover:text-foreground transition-colors">
+            <Link
+              to="/privacy-policy"
+              className="hover:text-foreground transition-colors"
+            >
               Privacy Policy
-            </button>
-            <button className="hover:text-foreground transition-colors">
+            </Link>
+            <Link
+              to="/terms-of-service"
+              className="hover:text-foreground transition-colors"
+            >
               Terms of Service
-            </button>
+            </Link>
           </div>
         </div>
       </div>

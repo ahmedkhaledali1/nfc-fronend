@@ -21,6 +21,7 @@ import CustomFileUpload from '@/components/form/CustomFileUpload';
 import SubmitButton from '@/components/ui/SubmitButton';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { getProduct, updateProduct } from '@/lib/service/endpoints';
+import CustomSelect from '@/components/form/CustomSelect';
 
 // Define the schema for product form
 const productSchema = z.object({
@@ -205,11 +206,11 @@ const ProductPage = () => {
                   rows={3}
                 />
 
-                <CustomSwitch
+                {/* <CustomSwitch
                   name="isMainProduct"
                   label="Main Product"
                   required={false}
-                />
+                /> */}
               </div>
 
               {/* Card Designs Section */}
@@ -248,12 +249,15 @@ const ProductPage = () => {
                           </div>
 
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <CustomInput
+                            <CustomSelect
                               name={`cardDesigns.${index}.color`}
                               label="Color"
                               placeholder="e.g., black, white, #000000"
                               required={true}
-                              type="text"
+                              options={[
+                                { value: 'black', label: 'Black' },
+                                { value: 'white', label: 'White' },
+                              ]}
                             />
 
                             <CustomFileUpload

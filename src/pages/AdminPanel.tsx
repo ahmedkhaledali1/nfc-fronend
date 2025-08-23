@@ -9,6 +9,9 @@ import MessagesPage from './admin/MessagesPage';
 import SettingsPage from './admin/SettingsPage';
 import CustomOrdersPage from './admin/CustomOrdersPage';
 import TestimonialsPage from './admin/TestimonialsPage';
+import SocialMediaPage from './admin/SocialMediaPage';
+import CountriesPage from './admin/CountriesPage';
+import CitiesPage from './admin/CitiesPage';
 
 const AdminPanel = () => {
   return (
@@ -22,6 +25,9 @@ const AdminPanel = () => {
         <Route path="bulk-orders" element={<CustomOrdersPage />} />
         <Route path="messages" element={<MessagesPage />} />
         <Route path="testimonials" element={<TestimonialsPage />} />
+        <Route path="social-media" element={<SocialMediaPage />} />
+        <Route path="countries" element={<CountriesPage />} />
+        <Route path="cities" element={<CitiesPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
     </Routes>

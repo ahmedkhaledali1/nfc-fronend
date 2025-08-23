@@ -18,14 +18,14 @@ function Step1PersosnalDet() {
         <CustomInput
           name="personalInfo.firstName"
           label="First Name"
-          placeholder="Mohammad"
+          placeholder="Name"
           required={true}
           type="text"
         />
         <CustomInput
           name="personalInfo.lastName"
           label="Last Name"
-          placeholder="Rabi"
+          placeholder="Last Name"
           required={true}
           type="text"
         />
@@ -34,7 +34,7 @@ function Step1PersosnalDet() {
       <CustomInput
         name="personalInfo.position"
         label="Position & Organization"
-        placeholder="Marketing Manager"
+        placeholder="Position & Organization"
         required={true}
         type="text"
       />
@@ -42,7 +42,7 @@ function Step1PersosnalDet() {
       <CustomInput
         name="personalInfo.organization"
         label="Organization"
-        placeholder="Connectify"
+        placeholder="Organization"
         required={true}
         type="text"
       />

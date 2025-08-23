@@ -135,3 +135,115 @@ export function createMessage(data: {
   const res = axiosInstance.post('/contact', data);
   return res;
 }
+
+export function getStatistics() {
+  const res = axiosInstance.get('/home/statistics');
+  return res;
+}
+
+export function getSocialMedia() {
+  const res = axiosInstance.get('/social-media');
+  return res;
+}
+
+export function createSocialMedia(data: {
+  platform: string;
+  url: string;
+  isActive: boolean;
+  displayOrder: number;
+}) {
+  const res = axiosInstance.post('/social-media', data);
+  return res;
+}
+
+export function updateSocialMedia(
+  id: string,
+  data: {
+    platform: string;
+    url: string;
+    isActive: boolean;
+    displayOrder: number;
+  }
+) {
+  const res = axiosInstance.patch(`/social-media/${id}`, data);
+  return res;
+}
+
+export function deleteSocialMedia(id: string) {
+  const res = axiosInstance.delete(`/social-media/${id}`);
+  return res;
+}
+
+export function getCountries() {
+  const res = axiosInstance.get('/countries');
+  return res;
+}
+
+export function getCitiesByCountry(countryId: string) {
+  const res = axiosInstance.get(`/cities/country/${countryId}`);
+  return res;
+}
+
+export function createCountry(data: {
+  name: string;
+  code: string;
+  isActive: boolean;
+  displayOrder: number;
+}) {
+  const res = axiosInstance.post('/countries', data);
+  return res;
+}
+
+export function updateCountry(
+  id: string,
+  data: {
+    name: string;
+    code: string;
+    isActive: boolean;
+    displayOrder: number;
+  }
+) {
+  const res = axiosInstance.patch(`/countries/${id}`, data);
+  return res;
+}
+
+export function deleteCountry(id: string) {
+  const res = axiosInstance.delete(`/countries/${id}`);
+  return res;
+}
+
+// Cities endpoints
+export function getCities() {
+  const res = axiosInstance.get('/cities');
+  return res;
+}
+
+export function createCity(data: {
+  name: string;
+  country: string;
+  deliveryFee: number;
+  isActive: boolean;
+  displayOrder: number;
+}) {
+  const res = axiosInstance.post('/cities', data);
+  return res;
+}
+
+export function updateCity(
+  id: string,
+  data: {
+    name: string;
+    country: string;
+    deliveryFee: number;
+    isActive: boolean;
+    displayOrder: number;
+  }
+) {
+  const res = axiosInstance.patch(`/cities/${id}`, data);
+  return res;
+}
+
+export function deleteCity(id: string) {
+  const res = axiosInstance.delete(`/cities/${id}`);
+  return res;
+}

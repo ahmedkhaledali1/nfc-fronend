@@ -7,16 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import {
-  Upload,
-  Building,
-  Users,
-  FileSpreadsheet,
-  ArrowLeft,
-} from 'lucide-react';
+import { Building, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -24,7 +16,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import CustomInput from '@/components/form/CustomInput';
 import CustomSelect from '@/components/form/CustomSelect';
-import CustomFileUpload from '@/components/form/CustomFileUpload';
 import { BulkOrder } from '@/lib/service/endpoints';
 import { useMutation } from '@tanstack/react-query';
 import SubmitButton from '@/components/ui/SubmitButton';

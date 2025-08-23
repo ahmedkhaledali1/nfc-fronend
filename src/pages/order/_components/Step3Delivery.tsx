@@ -3,24 +3,35 @@ import CustomSelect from '@/components/form/CustomSelect';
 import CustomSwitch from '@/components/form/CustomSwitch';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useQuery } from '@tanstack/react-query';
+import { getCountries, getCitiesByCountry } from '@/lib/service/endpoints';
 
-export const countries = [
-  {
-    code: 'JO',
-    name: 'Jordan',
-    cities: ['Amman', 'Irbid', 'Zarqa', 'Aqaba', 'Salt'],
-  },
-  {
-    code: 'UK',
-    name: 'United Kingdom',
-    cities: ['London', 'Manchester', 'Birmingham', 'Liverpool', 'Bristol'],
-  },
-];
 function Step3Delivery() {
-  const { watch } = useFormContext();
-  const selectedCountry = countries.find(
-    (c) => c.code === watch('deliveryInfo.country')
-  );
+  const { watch, setValue } = useFormContext();
+  const selectedCountry = watch('deliveryInfo.country');
+
+  // Fetch countries
+  const { data: countriesData, isLoading: countriesLoading } = useQuery({
+    queryKey: ['getCountries'],
+    queryFn: () => getCountries(),
+  });
+
+  // Fetch cities for selected country
+  const { data: citiesData, isLoading: citiesLoading } = useQuery({
+    queryKey: ['getCitiesByCountry', selectedCountry],
+    queryFn: () => getCitiesByCountry(selectedCountry),
+    enabled: !!selectedCountry, // Only fetch when country is selected
+  });
+
+  const countries = countriesData?.data?.data?.data || [];
+  const cities = citiesData?.data?.data?.cities || [];
+
+  // Reset city when country changes
+  React.useEffect(() => {
+    if (selectedCountry) {
+      setValue('deliveryInfo.city', '');
+    }
+  }, [selectedCountry, setValue]);
 
   return (
     <div className="space-y-4">
@@ -29,25 +40,32 @@ function Step3Delivery() {
           name="deliveryInfo.country"
           label="Country"
           required={true}
-          options={countries.map((country) => ({
-            value: country.code,
+          options={countries.map((country: any) => ({
+            value: country._id || country.id,
             label: country.name,
           }))}
-          placeholder="Select country"
+          placeholder={
+            countriesLoading ? 'Loading countries...' : 'Select country'
+          }
+          disabled={countriesLoading}
         />
 
         <CustomSelect
           name="deliveryInfo.city"
           label="City"
           required={true}
-          options={
-            selectedCountry?.cities.map((city) => ({
-              value: city,
-              label: city,
-            })) || []
+          options={cities.map((city: any) => ({
+            value: city._id || city.id,
+            label: city.name,
+          }))}
+          placeholder={
+            !selectedCountry
+              ? 'Select country first'
+              : citiesLoading
+              ? 'Loading cities...'
+              : 'Select city'
           }
-          placeholder="Select city"
-          disabled={!watch('deliveryInfo.country')}
+          disabled={!selectedCountry || citiesLoading}
         />
       </div>
 

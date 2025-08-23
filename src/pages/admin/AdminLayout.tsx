@@ -9,6 +9,9 @@ import {
   LayoutDashboard,
   Bell,
   Star,
+  Share2,
+  Globe,
+  MapPin,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -75,7 +78,10 @@ const AdminLayout = () => {
     { path: '/admin-panel/bulk-orders', icon: Package, label: 'Bulk Orders' },
     { path: '/admin-panel/messages', icon: MessageCircle, label: 'Messages' },
     { path: '/admin-panel/testimonials', icon: Star, label: 'Testimonials' },
-    { path: '/admin-panel/settings', icon: Settings, label: 'Settings' },
+    { path: '/admin-panel/social-media', icon: Share2, label: 'Social Media' },
+    { path: '/admin-panel/countries', icon: Globe, label: 'Countries' },
+    { path: '/admin-panel/cities', icon: MapPin, label: 'Cities' },
+    // { path: '/admin-panel/settings', icon: Settings, label: 'Settings' },
   ];
 
   return (

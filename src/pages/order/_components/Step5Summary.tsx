@@ -1,9 +1,18 @@
+import { getCountries } from '@/lib/service/endpoints';
+import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import { countries } from './Step3Delivery';
 
 function Step5Summary() {
   const { watch } = useFormContext();
+
+  const { data: countriesData, isLoading: countriesLoading } = useQuery({
+    queryKey: ['getCountries'],
+    queryFn: () => getCountries(),
+  });
+
+  const countries = countriesData?.data?.data?.data || [];
+
   const calculateTotal = () => {
     let total = 35;
     if (watch('cardDesign.includePrintedLogo')) total += 5;
@@ -53,9 +62,7 @@ function Step5Summary() {
             </div>
             <div>
               <span className="text-muted-foreground">Color:</span>{' '}
-              {watch('cardDesign.color') === 'black'
-                ? 'Black Matte'
-                : 'White Glossy'}
+              {watch('cardDesign.color') === 'black' ? 'Black' : 'White'}
             </div>
             <div>
               <span className="text-muted-foreground">Company Logo:</span>{' '}

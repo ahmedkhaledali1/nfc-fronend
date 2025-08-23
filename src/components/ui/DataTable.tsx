@@ -65,9 +65,24 @@ const DataTable: React.FC<DataTableProps> = ({
   const exportToCSV = () => {
     if (!exportData) return;
 
+    // Helper function to properly escape CSV values
+    const escapeCSVValue = (value: string) => {
+      // Convert to string and escape quotes
+      const stringValue = String(value).replace(/"/g, '""');
+      // Wrap in quotes if it contains comma, newline, or quote
+      if (
+        stringValue.includes(',') ||
+        stringValue.includes('\n') ||
+        stringValue.includes('"')
+      ) {
+        return `"${stringValue}"`;
+      }
+      return stringValue;
+    };
+
     const csvContent = [
-      exportData.headers,
-      ...data.map((item) => exportData.getRowData(item)),
+      exportData.headers.map(escapeCSVValue),
+      ...data.map((item) => exportData.getRowData(item).map(escapeCSVValue)),
     ]
       .map((row) => row.join(','))
       .join('\n');
