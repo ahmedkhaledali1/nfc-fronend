@@ -42,6 +42,7 @@ import {
 } from '@/lib/schemas/countrySchema';
 import PageHeader from './_components/pageHeader';
 import SubmitButton from '@/components/ui/SubmitButton';
+import DataTable from '@/components/ui/DataTable';
 
 interface Country {
   _id: string;
@@ -59,6 +60,8 @@ interface Country {
 const CountriesPage = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Country | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const queryClient = useQueryClient();
 
@@ -77,8 +80,8 @@ const CountriesPage = () => {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['getCountries'],
-    queryFn: () => getCountries(),
+    queryKey: ['getCountries', currentPage, itemsPerPage],
+    queryFn: () => getCountries(currentPage, itemsPerPage),
   });
 
   const createMutation = useMutation({
@@ -165,10 +168,237 @@ const CountriesPage = () => {
     });
   };
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
+
   const countries = countriesData?.data?.data?.data || [];
+  const paginatedData = countriesData?.data?.data?.pagination || {};
+
+  const columns = [
+    {
+      key: 'id',
+      label: 'ID',
+      render: (country: Country) => (
+        <span className="font-mono text-sm">#{country._id}</span>
+      ),
+    },
+    {
+      key: 'name',
+      label: 'Country Name',
+      render: (country: Country) => (
+        <div className="flex items-center gap-2">
+          <Globe className="h-4 w-4 text-muted-foreground" />
+          <span className="font-medium">{country.name}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'code',
+      label: 'Country Code',
+      render: (country: Country) => (
+        <Badge variant="outline" className="text-xs">
+          {country.code}
+        </Badge>
+      ),
+    },
+    {
+      key: 'displayOrder',
+      label: 'Display Order',
+      render: (country: Country) => (
+        <Badge variant="outline" className="text-xs">
+          {country.displayOrder}
+        </Badge>
+      ),
+    },
+
+    {
+      key: 'status',
+      label: 'Status',
+      render: (country: Country) => (
+        <Badge
+          variant={country.isActive ? 'default' : 'secondary'}
+          className={country.isActive ? 'bg-green-500' : ''}
+        >
+          {country.isActive ? 'Active' : 'Inactive'}
+        </Badge>
+      ),
+    },
+    {
+      key: 'createdAt',
+      label: 'Created Date',
+      render: (country: Country) => (
+        <div>
+          <div className="font-medium">
+            {new Date(country.createdAt).toLocaleDateString()}
+          </div>
+          <div className="text-sm text-muted-foreground">
+            {new Date(country.createdAt).toLocaleTimeString()}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'actions',
+      label: 'Actions',
+      render: (country: Country) => (
+        <div className="flex items-center gap-2">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleEdit(country)}
+                className="h-8 w-8 p-0"
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Edit Country</DialogTitle>
+                <DialogDescription>
+                  Update the country information.
+                </DialogDescription>
+              </DialogHeader>
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-4"
+                >
+                  <CustomInput
+                    name="name"
+                    label="Country Name"
+                    placeholder="Jordan"
+                    required={true}
+                    type="text"
+                  />
+                  <CustomInput
+                    name="code"
+                    label="Country Code"
+                    placeholder="JO"
+                    required={true}
+                    type="text"
+                  />
+                  <CustomInput
+                    name="displayOrder"
+                    label="Display Order"
+                    placeholder="0"
+                    required={false}
+                    type="number"
+                  />
+                  <CustomSwitch
+                    name="isActive"
+                    label="Active"
+                    required={false}
+                  />
+                  <DialogFooter className="mt-6">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setEditingItem(null)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button type="submit" disabled={updateMutation.isPending}>
+                      {updateMutation.isPending ? 'Updating...' : 'Update'}
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
+
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete the
+                  country "{country.name}" and all its associated cities.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => handleDelete(country._id)}
+                  className="bg-red-600 hover:bg-red-700"
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      ),
+    },
+  ];
+
+  const exportData = {
+    filename: 'countries.csv',
+    headers: [
+      'ID',
+      'Country Name',
+      'Country Code',
+      'Display Order',
+      'Cities Count',
+      'Status',
+      'Created Date',
+    ],
+    getRowData: (country: Country) => [
+      country._id,
+      country.name,
+      country.code,
+      country.displayOrder.toString(),
+      country.citiesCount !== undefined
+        ? country.citiesCount.toString()
+        : 'N/A',
+      country.isActive ? 'Active' : 'Inactive',
+      new Date(country.createdAt).toLocaleDateString(),
+    ],
+  };
+
+  const emptyState = {
+    icon: <Globe className="h-12 w-12 text-muted-foreground" />,
+    title: 'No countries found',
+    description: 'Get started by adding your first country.',
+  };
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-6">
+        <PageHeader
+          title="Countries Management"
+          description="Manage countries and their settings"
+        />
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <p className="text-muted-foreground mb-4">
+              Failed to load countries. Please try again.
+            </p>
+            <Button onClick={() => window.location.reload()}>Retry</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6 !w-full">
+    <div className="container mx-auto p-6">
       <PageHeader
         title="Countries Management"
         description="Manage countries and their settings"
@@ -249,195 +479,24 @@ const CountriesPage = () => {
         </Dialog>
       </div>
 
-      {isLoading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3].map((i) => (
-            <Card key={i} className="animate-pulse">
-              <CardHeader>
-                <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
-                <div className="h-6 bg-gray-200 rounded w-32"></div>
-              </CardHeader>
-              <CardContent>
-                <div className="h-4 bg-gray-200 rounded w-full mb-4"></div>
-                <div className="flex justify-between">
-                  <div className="h-8 bg-gray-200 rounded w-16"></div>
-                  <div className="h-8 bg-gray-200 rounded w-16"></div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {error && (
-        <Card className="border-red-200 bg-red-50">
-          <CardContent className="pt-6">
-            <p className="text-red-600">
-              Failed to load countries. Please try again.
-            </p>
-          </CardContent>
-        </Card>
-      )}
-
-      {!isLoading && !error && countries.length === 0 && (
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <Globe className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No countries found
-            </h3>
-            <p className="text-gray-500 mb-4">
-              Get started by adding your first country.
-            </p>
-            <Button onClick={() => setIsCreateDialogOpen(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Country
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      {!isLoading && !error && countries.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {countries.map((item: Country) => (
-            <Card key={item._id} className="card-premium">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Globe className="w-5 h-5 text-blue-600" />
-                    <CardTitle className="text-lg">{item.name}</CardTitle>
-                  </div>
-                  <Badge
-                    variant={item.isActive ? 'default' : 'secondary'}
-                    className={item.isActive ? 'bg-green-500' : ''}
-                  >
-                    {item.isActive ? 'Active' : 'Inactive'}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Badge variant="outline" className="text-xs">
-                        Code: {item.code}
-                      </Badge>
-                      <Badge variant="outline" className="text-xs">
-                        Order: {item.displayOrder}
-                      </Badge>
-                      {item.citiesCount !== undefined && (
-                        <Badge variant="outline" className="text-xs">
-                          <MapPin className="w-3 h-3 mr-1" />
-                          {item.citiesCount} cities
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex justify-between">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEdit(item)}
-                        >
-                          <Edit className="w-4 h-4 mr-1" />
-                          Edit
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Edit Country</DialogTitle>
-                          <DialogDescription>
-                            Update the country information.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <Form {...form}>
-                          <form
-                            onSubmit={form.handleSubmit(onSubmit)}
-                            className="space-y-4"
-                          >
-                            <CustomInput
-                              name="name"
-                              label="Country Name"
-                              placeholder="Jordan"
-                              required={true}
-                              type="text"
-                            />
-                            <CustomInput
-                              name="code"
-                              label="Country Code"
-                              placeholder="JO"
-                              required={true}
-                              type="text"
-                            />
-                            <CustomInput
-                              name="displayOrder"
-                              label="Display Order"
-                              placeholder="0"
-                              required={false}
-                              type="number"
-                            />
-                            <CustomSwitch
-                              name="isActive"
-                              label="Active"
-                              required={false}
-                            />
-                            <DialogFooter className="mt-6">
-                              <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => setEditingItem(null)}
-                              >
-                                Cancel
-                              </Button>
-                              <Button
-                                type="submit"
-                                disabled={updateMutation.isPending}
-                              >
-                                {updateMutation.isPending
-                                  ? 'Updating...'
-                                  : 'Update'}
-                              </Button>
-                            </DialogFooter>
-                          </form>
-                        </Form>
-                      </DialogContent>
-                    </Dialog>
-
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="destructive" size="sm">
-                          <Trash2 className="w-4 h-4 mr-1" />
-                          Delete
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This action cannot be undone. This will permanently
-                            delete the country and all its associated cities.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleDelete(item._id)}
-                            className="bg-red-600 hover:bg-red-700"
-                          >
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+      <DataTable
+        title="Countries"
+        description={`${countries.length} total countries`}
+        data={countries}
+        columns={columns}
+        exportData={exportData}
+        loading={isLoading}
+        emptyState={emptyState}
+        refetch={() => window.location.reload()}
+        pagination={{
+          currentPage: paginatedData.currentPage,
+          totalPages: paginatedData.totalPages,
+          totalItems: paginatedData.totalItems,
+          itemsPerPage: paginatedData.itemsPerPage,
+          onPageChange: handlePageChange,
+          onItemsPerPageChange: handleItemsPerPageChange,
+        }}
+      />
     </div>
   );
 };

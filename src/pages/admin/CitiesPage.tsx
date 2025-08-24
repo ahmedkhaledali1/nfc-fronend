@@ -41,6 +41,7 @@ import {
 import { citySchema, type CityFormData } from '@/lib/schemas/citySchema';
 import PageHeader from './_components/pageHeader';
 import SubmitButton from '@/components/ui/SubmitButton';
+import DataTable from '@/components/ui/DataTable';
 
 interface City {
   _id: string;
@@ -76,20 +77,31 @@ const CitiesPage = () => {
     },
   });
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const {
     data: citiesData,
     isLoading,
     error,
+    refetch,
   } = useQuery({
-    queryKey: ['getCities'],
-    queryFn: () => getCities(),
+    queryKey: ['getCities', currentPage, itemsPerPage],
+    queryFn: () => getCities(currentPage, itemsPerPage),
   });
 
+  const paginatedData = citiesData?.data?.data?.pagination || {};
   const { data: countriesData } = useQuery({
     queryKey: ['getCountries'],
-    queryFn: () => getCountries(),
+    queryFn: () => getCountries(1, 1000),
   });
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
   const createMutation = useMutation({
     mutationFn: createCity,
     onSuccess: () => {
@@ -186,8 +198,239 @@ const CitiesPage = () => {
     label: `${country.name} (${country.code})`,
   }));
 
+  const columns = [
+    {
+      key: 'id',
+      label: 'ID',
+      render: (city: City) => (
+        <span className="font-mono text-sm">#{city._id}</span>
+      ),
+    },
+    {
+      key: 'name',
+      label: 'City Name',
+      render: (city: City) => (
+        <div className="flex items-center gap-2">
+          <MapPin className="h-4 w-4 text-muted-foreground" />
+          <span className="font-medium">{city.name}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'country',
+      label: 'Country',
+      render: (city: City) => (
+        <Badge variant="outline" className="text-xs">
+          {city.country.name} ({city.country.code})
+        </Badge>
+      ),
+    },
+    {
+      key: 'deliveryFee',
+      label: 'Delivery Fee',
+      render: (city: City) => (
+        <div className="flex items-center gap-1">
+          <DollarSign className="h-4 w-4 text-green-600" />
+          <span className="font-medium">${city.deliveryFee}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'displayOrder',
+      label: 'Display Order',
+      render: (city: City) => (
+        <Badge variant="outline" className="text-xs">
+          {city.displayOrder}
+        </Badge>
+      ),
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (city: City) => (
+        <Badge
+          variant={city.isActive ? 'default' : 'secondary'}
+          className={city.isActive ? 'bg-green-500' : ''}
+        >
+          {city.isActive ? 'Active' : 'Inactive'}
+        </Badge>
+      ),
+    },
+    {
+      key: 'createdAt',
+      label: 'Created Date',
+      render: (city: City) => (
+        <div>
+          <div className="font-medium">
+            {new Date(city.createdAt).toLocaleDateString()}
+          </div>
+          <div className="text-sm text-muted-foreground">
+            {new Date(city.createdAt).toLocaleTimeString()}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'actions',
+      label: 'Actions',
+      render: (city: City) => (
+        <div className="flex items-center gap-2">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleEdit(city)}
+                className="h-8 w-8 p-0"
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Edit City</DialogTitle>
+                <DialogDescription>
+                  Update the city information.
+                </DialogDescription>
+              </DialogHeader>
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-4"
+                >
+                  <CustomInput
+                    name="name"
+                    label="City Name"
+                    placeholder="Amman"
+                    required={true}
+                    type="text"
+                  />
+                  <CustomSelect
+                    name="country"
+                    label="Country"
+                    required={true}
+                    options={countryOptions}
+                    placeholder="Select country"
+                  />
+                  <CustomInput
+                    name="deliveryFee"
+                    label="Delivery Fee"
+                    placeholder="5.00"
+                    required={true}
+                    type="number"
+                  />
+                  <CustomInput
+                    name="displayOrder"
+                    label="Display Order"
+                    placeholder="0"
+                    required={false}
+                    type="number"
+                  />
+                  <CustomSwitch
+                    name="isActive"
+                    label="Active"
+                    required={false}
+                  />
+                  <DialogFooter className="mt-6">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setEditingItem(null)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button type="submit" disabled={updateMutation.isPending}>
+                      {updateMutation.isPending ? 'Updating...' : 'Update'}
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
+
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete the
+                  city "{city.name}".
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => handleDelete(city._id)}
+                  className="bg-red-600 hover:bg-red-700"
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      ),
+    },
+  ];
+
+  const exportData = {
+    filename: 'cities.csv',
+    headers: [
+      'ID',
+      'City Name',
+      'Country',
+      'Delivery Fee',
+      'Display Order',
+      'Status',
+      'Created Date',
+    ],
+    getRowData: (city: City) => [
+      city._id,
+      city.name,
+      `${city.country.name} (${city.country.code})`,
+      `$${city.deliveryFee}`,
+      city.displayOrder.toString(),
+      city.isActive ? 'Active' : 'Inactive',
+      new Date(city.createdAt).toLocaleDateString(),
+    ],
+  };
+
+  const emptyState = {
+    icon: <MapPin className="h-12 w-12 text-muted-foreground" />,
+    title: 'No cities found',
+    description: 'Get started by adding your first city.',
+  };
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-6">
+        <PageHeader
+          title="Cities Management"
+          description="Manage cities and their delivery fees"
+        />
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <p className="text-muted-foreground mb-4">
+              Failed to load cities. Please try again.
+            </p>
+            <Button onClick={() => window.location.reload()}>Retry</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-6 !w-full">
+    <div className="container mx-auto p-6">
       <PageHeader
         title="Cities Management"
         description="Manage cities and their delivery fees"
@@ -276,203 +519,24 @@ const CitiesPage = () => {
         </Dialog>
       </div>
 
-      {isLoading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3].map((i) => (
-            <Card key={i} className="animate-pulse">
-              <CardHeader>
-                <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
-                <div className="h-6 bg-gray-200 rounded w-32"></div>
-              </CardHeader>
-              <CardContent>
-                <div className="h-4 bg-gray-200 rounded w-full mb-4"></div>
-                <div className="flex justify-between">
-                  <div className="h-8 bg-gray-200 rounded w-16"></div>
-                  <div className="h-8 bg-gray-200 rounded w-16"></div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {error && (
-        <Card className="border-red-200 bg-red-50">
-          <CardContent className="pt-6">
-            <p className="text-red-600">
-              Failed to load cities. Please try again.
-            </p>
-          </CardContent>
-        </Card>
-      )}
-
-      {!isLoading && !error && cities.length === 0 && (
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <MapPin className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No cities found
-            </h3>
-            <p className="text-gray-500 mb-4">
-              Get started by adding your first city.
-            </p>
-            <Button onClick={() => setIsCreateDialogOpen(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add City
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      {!isLoading && !error && cities.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {cities.map((item: City) => (
-            <Card key={item._id} className="card-premium">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <MapPin className="w-5 h-5 text-blue-600" />
-                    <CardTitle className="text-lg">{item.name}</CardTitle>
-                  </div>
-                  <Badge
-                    variant={item.isActive ? 'default' : 'secondary'}
-                    className={item.isActive ? 'bg-green-500' : ''}
-                  >
-                    {item.isActive ? 'Active' : 'Inactive'}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Badge variant="outline" className="text-xs">
-                        {item.country.name} ({item.country.code})
-                      </Badge>
-                      <Badge variant="outline" className="text-xs">
-                        Order: {item.displayOrder}
-                      </Badge>
-                      <Badge
-                        variant="outline"
-                        className="text-xs bg-green-100 text-green-800"
-                      >
-                        <DollarSign className="w-3 h-3 mr-1" />$
-                        {item.deliveryFee}
-                      </Badge>
-                    </div>
-                  </div>
-                  <div className="flex justify-between">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEdit(item)}
-                        >
-                          <Edit className="w-4 h-4 mr-1" />
-                          Edit
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Edit City</DialogTitle>
-                          <DialogDescription>
-                            Update the city information.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <Form {...form}>
-                          <form
-                            onSubmit={form.handleSubmit(onSubmit)}
-                            className="space-y-4"
-                          >
-                            <CustomInput
-                              name="name"
-                              label="City Name"
-                              placeholder="Amman"
-                              required={true}
-                              type="text"
-                            />
-                            <CustomSelect
-                              name="country"
-                              label="Country"
-                              required={true}
-                              options={countryOptions}
-                              placeholder="Select country"
-                            />
-                            <CustomInput
-                              name="deliveryFee"
-                              label="Delivery Fee"
-                              placeholder="5.00"
-                              required={true}
-                              type="number"
-                            />
-                            <CustomInput
-                              name="displayOrder"
-                              label="Display Order"
-                              placeholder="0"
-                              required={false}
-                              type="number"
-                            />
-                            <CustomSwitch
-                              name="isActive"
-                              label="Active"
-                              required={false}
-                            />
-                            <DialogFooter className="mt-6">
-                              <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => setEditingItem(null)}
-                              >
-                                Cancel
-                              </Button>
-                              <Button
-                                type="submit"
-                                disabled={updateMutation.isPending}
-                              >
-                                {updateMutation.isPending
-                                  ? 'Updating...'
-                                  : 'Update'}
-                              </Button>
-                            </DialogFooter>
-                          </form>
-                        </Form>
-                      </DialogContent>
-                    </Dialog>
-
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="destructive" size="sm">
-                          <Trash2 className="w-4 h-4 mr-1" />
-                          Delete
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This action cannot be undone. This will permanently
-                            delete the city.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleDelete(item._id)}
-                            className="bg-red-600 hover:bg-red-700"
-                          >
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+      <DataTable
+        title="Cities"
+        description={`${cities.length} total cities`}
+        data={cities}
+        columns={columns}
+        exportData={exportData}
+        loading={isLoading}
+        emptyState={emptyState}
+        refetch={refetch}
+        pagination={{
+          currentPage: paginatedData.currentPage,
+          totalPages: paginatedData.totalPages,
+          totalItems: paginatedData.totalItems,
+          itemsPerPage: paginatedData.itemsPerPage,
+          onPageChange: handlePageChange,
+          onItemsPerPageChange: handleItemsPerPageChange,
+        }}
+      />
     </div>
   );
 };

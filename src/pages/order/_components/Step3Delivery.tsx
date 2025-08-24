@@ -1,7 +1,7 @@
 import CustomInput from '@/components/form/CustomInput';
 import CustomSelect from '@/components/form/CustomSelect';
 import CustomSwitch from '@/components/form/CustomSwitch';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
 import { getCountries, getCitiesByCountry } from '@/lib/service/endpoints';
@@ -13,7 +13,7 @@ function Step3Delivery() {
   // Fetch countries
   const { data: countriesData, isLoading: countriesLoading } = useQuery({
     queryKey: ['getCountries'],
-    queryFn: () => getCountries(),
+    queryFn: () => getCountries(1, 1000),
   });
 
   // Fetch cities for selected country
@@ -32,6 +32,16 @@ function Step3Delivery() {
       setValue('deliveryInfo.city', '');
     }
   }, [selectedCountry, setValue]);
+
+  useEffect(() => {
+    if (watch('deliveryInfo.city')) {
+      setValue(
+        'deliveryInfo.cityFee',
+        cities.find((city: any) => city._id === watch('deliveryInfo.city'))
+          ?.deliveryFee
+      );
+    }
+  }, [watch('deliveryInfo.city')]);
 
   return (
     <div className="space-y-4">

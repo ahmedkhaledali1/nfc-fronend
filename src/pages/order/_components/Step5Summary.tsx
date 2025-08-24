@@ -8,7 +8,7 @@ function Step5Summary() {
 
   const { data: countriesData, isLoading: countriesLoading } = useQuery({
     queryKey: ['getCountries'],
-    queryFn: () => getCountries(),
+    queryFn: () => getCountries(1, 1000),
   });
 
   const countries = countriesData?.data?.data?.data || [];
@@ -18,6 +18,7 @@ function Step5Summary() {
     if (watch('cardDesign.includePrintedLogo')) total += 5;
     return total;
   };
+  console.log('watch', watch());
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -75,16 +76,16 @@ function Step5Summary() {
       <div>
         <h4 className="font-semibold mb-3">Delivery Information</h4>
         <div className="space-y-2 text-sm">
-          <div>
+          {/* <div>
             <span className="text-muted-foreground">Country:</span>{' '}
             {
               countries.find((c) => c.code === watch('deliveryInfo.country'))
                 ?.name
             }
-          </div>
+          </div> */}
           <div>
-            <span className="text-muted-foreground">City:</span>{' '}
-            {watch('deliveryInfo.city')}
+            <span className="text-muted-foreground">City Fee:</span>{' '}
+            {watch('deliveryInfo.cityFee')}
           </div>
           <div>
             <span className="text-muted-foreground">Address:</span>{' '}
@@ -115,6 +116,18 @@ function Step5Summary() {
         <div className="flex justify-between items-center text-lg font-semibold">
           <span>Total:</span>
           <span className="gradient-text">{calculateTotal()} JOD</span>
+        </div>
+        <div className="flex justify-between items-center text-lg font-semibold">
+          <span>City Fee:</span>
+          <span className="gradient-text">
+            {watch('deliveryInfo.cityFee')} JOD
+          </span>
+        </div>
+        <div className="flex justify-between items-center text-lg font-semibold">
+          <span>Final Total:</span>
+          <span className="gradient-text">
+            {calculateTotal() + watch('deliveryInfo.cityFee')} JOD
+          </span>
         </div>
       </div>
     </div>

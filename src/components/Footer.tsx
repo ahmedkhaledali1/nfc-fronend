@@ -11,14 +11,44 @@ import {
   MessageSquare,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { getSocialMedia } from '@/lib/service/endpoints';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { getSocialMedia, subscribeToNewsletter } from '@/lib/service/endpoints';
+import CustomInput from './form/CustomInput';
+import { FormProvider, useForm } from 'react-hook-form';
+import SubmitButton from './ui/SubmitButton';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
 
 const Footer = () => {
   const { data: socialMediaData } = useQuery({
     queryKey: ['getSocialMedia'],
     queryFn: () => getSocialMedia(),
   });
+
+  const { mutate: subscribe, isPending } = useMutation({
+    mutationFn: (data: any) => subscribeToNewsletter(data),
+    onSuccess: () => {
+      methods.reset();
+      toast.success('Subscribed to newsletter');
+    },
+    onError: () => {
+      toast.error('Failed to subscribe to newsletter');
+    },
+  });
+  const schema = z.object({
+    email: z.string().email(),
+  });
+  const methods = useForm({
+    defaultValues: {
+      email: '',
+    },
+    resolver: zodResolver(schema),
+  });
+
+  function onSubmit(data: any) {
+    subscribe(data);
+  }
 
   const socialMediaItems = socialMediaData?.data?.data?.data || [];
 
@@ -131,14 +161,22 @@ const Footer = () => {
             <p className="text-muted-foreground text-sm">
               Get the latest updates on new features and exclusive offers.
             </p>
-            <div className="flex space-x-2">
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1"
-              />
-              <Button className="btn-hero">Subscribe</Button>
-            </div>
+            <form
+              className="flex space-x-2"
+              onSubmit={methods.handleSubmit(onSubmit)}
+            >
+              <FormProvider {...methods}>
+                <CustomInput
+                  name="email"
+                  placeholder="Enter your email"
+                  type="email"
+                  required
+                />
+                <SubmitButton disabled={isPending} className=" !h-[40px]">
+                  {isPending ? 'Subscribing...' : 'Subscribe'}
+                </SubmitButton>
+              </FormProvider>
+            </form>
           </div>
         </div>
 

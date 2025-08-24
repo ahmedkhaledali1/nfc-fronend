@@ -12,6 +12,7 @@ import {
   Share2,
   Globe,
   MapPin,
+  Users,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -79,6 +80,7 @@ const AdminLayout = () => {
     { path: '/admin-panel/messages', icon: MessageCircle, label: 'Messages' },
     { path: '/admin-panel/testimonials', icon: Star, label: 'Testimonials' },
     { path: '/admin-panel/social-media', icon: Share2, label: 'Social Media' },
+    { path: '/admin-panel/subscribers', icon: Users, label: 'Subscribers' },
     { path: '/admin-panel/countries', icon: Globe, label: 'Countries' },
     { path: '/admin-panel/cities', icon: MapPin, label: 'Cities' },
     // { path: '/admin-panel/settings', icon: Settings, label: 'Settings' },

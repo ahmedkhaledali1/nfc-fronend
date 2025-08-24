@@ -10,6 +10,7 @@ import SettingsPage from './admin/SettingsPage';
 import CustomOrdersPage from './admin/CustomOrdersPage';
 import TestimonialsPage from './admin/TestimonialsPage';
 import SocialMediaPage from './admin/SocialMediaPage';
+import SubscribersPage from './admin/SubscribersPage';
 import CountriesPage from './admin/CountriesPage';
 import CitiesPage from './admin/CitiesPage';
 
@@ -26,6 +27,7 @@ const AdminPanel = () => {
         <Route path="messages" element={<MessagesPage />} />
         <Route path="testimonials" element={<TestimonialsPage />} />
         <Route path="social-media" element={<SocialMediaPage />} />
+        <Route path="subscribers" element={<SubscribersPage />} />
         <Route path="countries" element={<CountriesPage />} />
         <Route path="cities" element={<CitiesPage />} />
         <Route path="settings" element={<SettingsPage />} />

@@ -12,11 +12,16 @@ import {
   MessageCircle,
   TrendingUp,
   Share2,
+  Users,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { getStatistics, getSocialMedia } from '@/lib/service/endpoints';
+import {
+  getStatistics,
+  getSocialMedia,
+  getSubscribers,
+} from '@/lib/service/endpoints';
 import PageHeader from './_components/pageHeader';
 
 const DashboardPage = () => {
@@ -34,7 +39,13 @@ const DashboardPage = () => {
     queryFn: () => getSocialMedia(),
   });
 
+  const { data: subscribersData } = useQuery({
+    queryKey: ['getSubscribers'],
+    queryFn: () => getSubscribers(),
+  });
+
   const socialMediaCount = socialMediaData?.data?.data?.length || 0;
+  const subscribersCount = subscribersData?.data?.data?.length || 0;
 
   const stats = [
     {
@@ -58,13 +69,20 @@ const DashboardPage = () => {
       icon: MessageCircle,
       color: 'text-orange-600',
     },
-    {
-      title: 'Social Media',
-      value: socialMediaCount.toString(),
-      description: 'Active platforms',
-      icon: Share2,
-      color: 'text-purple-600',
-    },
+    // {
+    //   title: 'Social Media',
+    //   value: socialMediaCount.toString(),
+    //   description: 'Active platforms',
+    //   icon: Share2,
+    //   color: 'text-purple-600',
+    // },
+    // {
+    //   title: 'Subscribers',
+    //   value: subscribersCount.toString(),
+    //   description: 'Newsletter subscribers',
+    //   icon: Users,
+    //   color: 'text-indigo-600',
+    // },
   ];
 
   return (
@@ -165,6 +183,15 @@ const DashboardPage = () => {
                 <h4 className="font-medium">Manage Social Media</h4>
                 <p className="text-sm text-muted-foreground">
                   Update social media links
+                </p>
+              </Link>
+              <Link
+                to="/admin-panel/subscribers"
+                className="block p-4 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
+              >
+                <h4 className="font-medium">Manage Subscribers</h4>
+                <p className="text-sm text-muted-foreground">
+                  View and manage newsletter subscribers
                 </p>
               </Link>
             </div>

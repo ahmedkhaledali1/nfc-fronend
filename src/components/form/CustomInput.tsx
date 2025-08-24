@@ -13,7 +13,7 @@ function CustomInput({
 }: {
   name: string;
   placeholder: string;
-  label: string;
+  label?: string;
   required: boolean;
   type: string;
 }) {
@@ -24,9 +24,11 @@ function CustomInput({
   const error = get(errors, name);
   return (
     <div className="space-y-2">
-      <Label htmlFor={name}>
-        {label} {required && <span className="text-red-500">*</span>}
-      </Label>
+      {label && (
+        <Label htmlFor={name}>
+          {label} {required && <span className="text-red-500">*</span>}
+        </Label>
+      )}
       <Input
         id={name}
         {...register(name, {

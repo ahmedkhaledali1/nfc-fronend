@@ -174,8 +174,13 @@ export function deleteSocialMedia(id: string) {
   return res;
 }
 
-export function getCountries() {
-  const res = axiosInstance.get('/countries');
+export function getCountries(currentPage: number, itemsPerPage: number) {
+  const res = axiosInstance.get(`/countries`, {
+    params: {
+      page: currentPage,
+      limit: itemsPerPage,
+    },
+  });
   return res;
 }
 
@@ -213,8 +218,13 @@ export function deleteCountry(id: string) {
 }
 
 // Cities endpoints
-export function getCities() {
-  const res = axiosInstance.get('/cities');
+export function getCities(currentPage: number, itemsPerPage: number) {
+  const res = axiosInstance.get(`/cities`, {
+    params: {
+      page: currentPage,
+      limit: itemsPerPage,
+    },
+  });
   return res;
 }
 
@@ -245,5 +255,27 @@ export function updateCity(
 
 export function deleteCity(id: string) {
   const res = axiosInstance.delete(`/cities/${id}`);
+  return res;
+}
+
+export function subscribeToNewsletter(data: { email: string }) {
+  const res = axiosInstance.post('/subscribers/subscribe', data);
+  return res;
+}
+
+export function getSubscribers() {
+  const res = axiosInstance.get('/subscribers');
+  return res;
+}
+export function deleteSubscriber(id: string) {
+  const res = axiosInstance.delete(`/subscribers/${id}`);
+  return res;
+}
+export function getSubscriber(id: string) {
+  const res = axiosInstance.get(`/subscribers/${id}`);
+  return res;
+}
+export function updateSubscriber(id: string, data: { email: string }) {
+  const res = axiosInstance.patch(`/subscribers/${id}`, data);
   return res;
 }
