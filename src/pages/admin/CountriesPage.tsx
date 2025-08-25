@@ -97,10 +97,6 @@ const CountriesPage = () => {
         displayOrder: 0,
       });
     },
-    onError: (error) => {
-      toast.error('Failed to create country');
-      console.error('Create error:', error);
-    },
   });
 
   const updateMutation = useMutation({
@@ -117,10 +113,6 @@ const CountriesPage = () => {
         displayOrder: 0,
       });
     },
-    onError: (error) => {
-      toast.error('Failed to update country');
-      console.error('Update error:', error);
-    },
   });
 
   const deleteMutation = useMutation({
@@ -128,10 +120,6 @@ const CountriesPage = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['getCountries'] });
       toast.success('Country deleted successfully');
-    },
-    onError: (error) => {
-      toast.error('Failed to delete country');
-      console.error('Delete error:', error);
     },
   });
 

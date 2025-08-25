@@ -116,10 +116,6 @@ const CitiesPage = () => {
         displayOrder: 0,
       } as CityFormData);
     },
-    onError: (error) => {
-      toast.error('Failed to create city');
-      console.error('Create error:', error);
-    },
   });
 
   const updateMutation = useMutation({
@@ -137,10 +133,6 @@ const CitiesPage = () => {
         displayOrder: 0,
       } as CityFormData);
     },
-    onError: (error) => {
-      toast.error('Failed to update city');
-      console.error('Update error:', error);
-    },
   });
 
   const deleteMutation = useMutation({
@@ -148,10 +140,6 @@ const CitiesPage = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['getCities'] });
       toast.success('City deleted successfully');
-    },
-    onError: (error) => {
-      toast.error('Failed to delete city');
-      console.error('Delete error:', error);
     },
   });
 

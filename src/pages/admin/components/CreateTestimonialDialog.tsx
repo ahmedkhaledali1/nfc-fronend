@@ -18,11 +18,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createTestimonial } from '@/lib/service/endpoints';
 import { Star, Building, Image, X } from 'lucide-react';
 import SubmitButton from '@/components/ui/SubmitButton';
+import { toast } from 'sonner';
 
 interface CreateTestimonialDialogProps {
   isOpen: boolean;
@@ -35,7 +35,6 @@ const CreateTestimonialDialog = ({
   onClose,
   onSuccess,
 }: CreateTestimonialDialogProps) => {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     name: '',
@@ -51,10 +50,7 @@ const CreateTestimonialDialog = ({
     useMutation({
       mutationFn: (formDataObj: FormData) => createTestimonial(formDataObj),
       onSuccess: () => {
-        toast({
-          title: 'Testimonial Created',
-          description: 'The testimonial has been created successfully.',
-        });
+        toast.success('The testimonial has been created successfully.');
         queryClient.invalidateQueries({ queryKey: ['getTestimonials'] });
         onSuccess?.();
         onClose();
@@ -70,12 +66,9 @@ const CreateTestimonialDialog = ({
       },
       onError: (error: any) => {
         console.error('Create error:', error);
-        toast({
-          title: 'Create Failed',
-          description:
-            error?.response?.data?.message || 'Failed to create testimonial.',
-          variant: 'destructive',
-        });
+        toast.error(
+          error?.response?.data?.message || 'Failed to create testimonial.'
+        );
       },
     });
 

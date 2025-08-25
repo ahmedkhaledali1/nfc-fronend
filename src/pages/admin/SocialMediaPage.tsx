@@ -103,10 +103,6 @@ const SocialMediaPage = () => {
         displayOrder: 0,
       });
     },
-    onError: (error) => {
-      toast.error('Failed to create social media link');
-      console.error('Create error:', error);
-    },
   });
 
   const updateMutation = useMutation({
@@ -123,10 +119,6 @@ const SocialMediaPage = () => {
         displayOrder: 0,
       });
     },
-    onError: (error) => {
-      toast.error('Failed to update social media link');
-      console.error('Update error:', error);
-    },
   });
 
   const deleteMutation = useMutation({
@@ -134,10 +126,6 @@ const SocialMediaPage = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['getSocialMedia'] });
       toast.success('Social media link deleted successfully');
-    },
-    onError: (error) => {
-      toast.error('Failed to delete social media link');
-      console.error('Delete error:', error);
     },
   });
 

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import cookies from 'js-cookies';
+import { toast } from 'sonner';
 
 const axiosInstance = axios.create({
   baseURL: `${import.meta.env.VITE_BACKEND_URL}`,
@@ -27,10 +28,19 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
+    console.log('error..', error);
     if (error.response && error.response.status === 401) {
       console.log('Unauthorized access, redirecting to login...');
-      // logOut();
+      cookies.removeItem('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('isAuthenticated');
+      window.location.href = '/admin-panel/login';
     }
+
+    if (error.response && error.response.status === 400) {
+      toast.error(error.response.data.message);
+    }
+
     return Promise.reject(error);
   }
 );

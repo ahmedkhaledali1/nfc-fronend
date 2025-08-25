@@ -32,9 +32,6 @@ const Footer = () => {
       methods.reset();
       toast.success('Subscribed to newsletter');
     },
-    onError: () => {
-      toast.error('Failed to subscribe to newsletter');
-    },
   });
   const schema = z.object({
     email: z.string().email(),
