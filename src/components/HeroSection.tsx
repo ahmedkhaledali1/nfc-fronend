@@ -104,7 +104,7 @@ const HeroSection = () => {
               <div className="space-y-4">
                 <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight slide-in-right">
                   {mainProduct?.title}{' '}
-                  <span className="gradient-text">{mainProduct?.price}$</span>
+                  <span className="gradient-text">{mainProduct?.price}JOB</span>
                 </h1>
 
                 <p

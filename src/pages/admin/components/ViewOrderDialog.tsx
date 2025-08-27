@@ -114,7 +114,19 @@ const ViewOrderDialog = ({ isOpen, onClose, order }: ViewOrderDialogProps) => {
               <p className="text-base">{order.personalInfo?.email || 'N/A'}</p>
             </div>
           </div>
-
+          {order.personalInfo?.businessEmail && (
+            <div>
+              <label className="text-sm font-medium text-muted-foreground">
+                Business Email
+              </label>
+              <div className="flex items-center gap-2">
+                <Mail className="w-4 h-4 text-muted-foreground" />
+                <p className="text-base">
+                  {order.personalInfo?.businessEmail || 'N/A'}
+                </p>
+              </div>
+            </div>
+          )}
           <div>
             <label className="text-sm font-medium text-muted-foreground">
               Phone Numbers
@@ -152,6 +164,28 @@ const ViewOrderDialog = ({ isOpen, onClose, order }: ViewOrderDialogProps) => {
                 )}
               </p>
             </div>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-muted-foreground">
+              Instagram URL
+            </label>
+            <div className="flex items-center gap-2">
+              <Globe className="w-4 h-4 text-muted-foreground" />
+              <p className="text-base">
+                {order.personalInfo?.instagramUrl ? (
+                  <a
+                    href={order.personalInfo.instagramUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                  >
+                    {order.personalInfo.instagramUrl}
+                  </a>
+                ) : (
+                  'N/A'
+                )}
+              </p>
+            </div>{' '}
           </div>
         </div>
       </div>
@@ -207,7 +241,10 @@ const ViewOrderDialog = ({ isOpen, onClose, order }: ViewOrderDialogProps) => {
               </label>
               <div className="mt-2">
                 <img
-                  src={order.cardDesign.companyLogo}
+                  src={`${import.meta.env.VITE_BACKEND_DOMAIN}${
+                    order.cardDesign.companyLogo
+                  }`}
+                  crossOrigin="anonymous"
                   alt="Company Logo"
                   className="max-w-32 max-h-32 object-contain border rounded-lg"
                 />
@@ -254,6 +291,12 @@ const ViewOrderDialog = ({ isOpen, onClose, order }: ViewOrderDialogProps) => {
               <p className="text-base">{order.deliveryInfo.addressLine2}</p>
             </div>
           )}
+          <div>
+            <label className="text-sm font-medium text-muted-foreground">
+              Postcode
+            </label>
+            <p className="text-base">{order.deliveryInfo?.postcode || 'N/A'}</p>
+          </div>
         </div>
 
         <div className="space-y-4">

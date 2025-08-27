@@ -6,7 +6,7 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Palette } from 'lucide-react';
 
-function Step2CardDesign() {
+function Step2CardDesign({ product }: { product: any }) {
   const { watch } = useFormContext();
 
   return (
@@ -30,24 +30,17 @@ function Step2CardDesign() {
           name="cardDesign.color"
           label="Choose Your Card Color"
           required={true}
-          options={[
-            {
-              value: 'black',
-              label: 'Black',
-              description: 'Professional and sleek black finish',
-              icon: (
-                <div className="w-6 h-6 bg-black rounded-full border-2 border-border" />
-              ),
-            },
-            {
-              value: 'white',
-              label: 'White',
-              description: 'Clean and modern white finish',
-              icon: (
-                <div className="w-6 h-6 bg-white rounded-full border-2 border-border" />
-              ),
-            },
-          ]}
+          options={product?.cardDesigns?.map((design: any) => ({
+            value: design.color,
+            label: design.color,
+            description: design.color,
+            icon: (
+              <div
+                className="w-6 h-6 rounded-full border-2 border-border"
+                style={{ backgroundColor: design.color }}
+              />
+            ),
+          }))}
         />
       </div>
 

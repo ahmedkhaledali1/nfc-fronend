@@ -63,11 +63,25 @@ function Step1PersosnalDet() {
         required={true}
         type="email"
       />
+      <CustomInput
+        name="personalInfo.businessEmail"
+        label="Business Email"
+        placeholder="your@business.com"
+        required={false}
+        type="email"
+      />
 
       <CustomInput
         name="personalInfo.linkedinUrl"
         label="LinkedIn Profile URL"
         placeholder="https://linkedin.com/in/yourprofile"
+        required={false}
+        type="url"
+      />
+      <CustomInput
+        name="personalInfo.instagramUrl"
+        label="Instagram Profile URL"
+        placeholder="https://instagram.com/yourprofile"
         required={false}
         type="url"
       />

@@ -186,13 +186,16 @@ const BulkOrders = () => {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span>10-49 cards</span>
+                      <span>1-49 cards</span>
+                      <span>15 JOD</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span>50-99 cards</span>
+                      <span>13 JOD</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span>100+ cards</span>
+                      <span>12 JOD</span>
                     </div>
                     <div className="text-xs text-muted-foreground pt-2">
                       * Prices include custom branding and free delivery

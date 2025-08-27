@@ -61,7 +61,7 @@ const Product = () => {
     product?.cardDesigns?.map((design) => ({
       id: design.color.toLowerCase(),
       name: design.color.charAt(0).toUpperCase() + design.color.slice(1),
-      color: design.color.toLowerCase() === 'white' ? 'bg-white' : 'bg-black',
+      color: design.color,
     })) || [];
 
   const cleanImagePath = (path: string) => {
@@ -176,9 +176,9 @@ const Product = () => {
                       }`}
                     >
                       <div
-                        className={`w-6 h-6 rounded-full border-2 border-border ${color.color}`}
+                        style={{ backgroundColor: color.color }}
+                        className={`w-6 h-6 rounded-full border-2 border-border`}
                       ></div>
-                      <span className="font-medium">{color.name}</span>
                     </button>
                   ))}
                 </div>
@@ -342,6 +342,7 @@ const Product = () => {
         isOpen={isOrderModalOpen}
         onClose={() => setIsOrderModalOpen(false)}
         selectedColor={selectedColor}
+        product={product}
       />
 
       <Footer />

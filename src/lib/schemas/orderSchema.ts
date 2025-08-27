@@ -13,7 +13,9 @@ export const orderFormSchema = z.object({
       z.string().min(8, 'Phone number must be at least 8 characters')
     ),
     email: z.string().email('Invalid email address'),
+    businessEmail: z.string().optional().nullable(),
     linkedinUrl: z.string().optional().nullable(),
+    instagramUrl: z.string().optional().nullable(),
     // personalPicture: z.any().optional(),
   }),
 
@@ -37,6 +39,7 @@ export const orderFormSchema = z.object({
       .string()
       .min(8, 'Phone number must be at least 8 characters'),
     deliveryEmail: z.string().email('Invalid email address'),
+    postcode: z.string().optional().nullable(),
   }),
 
   // Product & Payment

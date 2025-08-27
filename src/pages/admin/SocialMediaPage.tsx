@@ -90,6 +90,8 @@ const SocialMediaPage = () => {
     queryFn: () => getSocialMedia(),
   });
 
+  // console.log('socialMediaData/..', socialMediaData);
+
   const createMutation = useMutation({
     mutationFn: createSocialMedia,
     onSuccess: () => {
@@ -215,10 +217,6 @@ const SocialMediaPage = () => {
     { value: 'instagram', label: 'Instagram' },
     { value: 'whatsapp', label: 'WhatsApp' },
     { value: 'linkedin', label: 'LinkedIn' },
-    { value: 'twitter', label: 'Twitter' },
-    { value: 'youtube', label: 'YouTube' },
-    { value: 'tiktok', label: 'TikTok' },
-    { value: 'snapchat', label: 'Snapchat' },
   ];
 
   const socialMediaItems = socialMediaData?.data?.data?.data || [];

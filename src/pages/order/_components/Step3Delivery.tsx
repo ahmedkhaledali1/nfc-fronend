@@ -94,6 +94,13 @@ function Step3Delivery() {
         required={false}
         type="text"
       />
+      <CustomInput
+        name="deliveryInfo.postcode"
+        label="Postcode"
+        placeholder="12345"
+        required={false}
+        type="text"
+      />
 
       <CustomSwitch
         name="deliveryInfo.useSameContact"

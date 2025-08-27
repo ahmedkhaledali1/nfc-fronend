@@ -6,7 +6,7 @@ import PageHeader from './_components/pageHeader';
 import DataTable from '@/components/ui/DataTable';
 import { deleteOrder, getOrders, updateOrder } from '@/lib/service/endpoints';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Edit, Trash2, Eye } from 'lucide-react';
+import { Edit, Trash2, Eye, RefreshCw } from 'lucide-react';
 import EditOrderDialog from './components/EditOrderDialog';
 import ViewOrderDialog from './components/ViewOrderDialog';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
@@ -19,6 +19,11 @@ const OrdersPage = () => {
   const { data, isLoading, refetch, error } = useQuery({
     queryKey: ['getOrders', currentPage, itemsPerPage],
     queryFn: () => getOrders(currentPage, itemsPerPage),
+    staleTime: 0, // Data is considered stale immediately
+    gcTime: 5 * 60 * 1000, // Cache for 5 minutes
+    refetchOnWindowFocus: true, // Refetch when window gains focus
+    refetchOnMount: true, // Refetch when component mounts
+    refetchOnReconnect: true, // Refetch when network reconnects
   });
 
   const { mutate: updateOrderMutation, isPending: isUpdatingOrder } =
@@ -29,6 +34,7 @@ const OrdersPage = () => {
           title: 'Order Updated',
           description: 'The order has been updated successfully.',
         });
+        refetch(); // Refetch data after successful update
       },
     });
 
@@ -269,12 +275,25 @@ const OrdersPage = () => {
     description: 'Orders will appear here once customers start placing them.',
   };
 
+  console.log('orders...', orders);
   return (
     <div className="p-6 !w-full">
       <PageHeader
         title="Orders Management"
         description="View and manage customer orders"
-      />
+      >
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => refetch()}
+          disabled={isLoading}
+        >
+          <RefreshCw
+            className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`}
+          />
+          Refresh
+        </Button>
+      </PageHeader>
 
       <DataTable
         title="Recent Orders"

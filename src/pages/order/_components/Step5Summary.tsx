@@ -3,8 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
-function Step5Summary() {
-  const { watch } = useFormContext();
+function Step5Summary({ product }: { product: any }) {
+  const { watch, formState } = useFormContext();
 
   const { data: countriesData, isLoading: countriesLoading } = useQuery({
     queryKey: ['getCountries'],
@@ -63,11 +63,11 @@ function Step5Summary() {
             </div>
             <div>
               <span className="text-muted-foreground">Color:</span>{' '}
-              {watch('cardDesign.color') === 'black' ? 'Black' : 'White'}
+              {watch('cardDesign.color')}
             </div>
             <div>
               <span className="text-muted-foreground">Company Logo:</span>{' '}
-              {watch('cardDesign.includePrintedLogo') ? 'Yes (+5 JOD)' : 'No'}
+              {watch('cardDesign.includePrintedLogo') ? 'Yes ' : 'No'}
             </div>
           </div>
         </div>
@@ -84,7 +84,7 @@ function Step5Summary() {
             }
           </div> */}
           <div>
-            <span className="text-muted-foreground">City Fee:</span>{' '}
+            <span className="text-muted-foreground">Delivery Fee:</span>{' '}
             {watch('deliveryInfo.cityFee')}
           </div>
           <div>
@@ -104,6 +104,10 @@ function Step5Summary() {
               ? watch('personalInfo.email')
               : watch('deliveryInfo.deliveryEmail')}
           </div>
+          <div>
+            <span className="text-muted-foreground">Postcode:</span>{' '}
+            {watch('deliveryInfo.postcode')}
+          </div>
         </div>
       </div>
 
@@ -115,10 +119,10 @@ function Step5Summary() {
       <div className="border-t border-border pt-4">
         <div className="flex justify-between items-center text-lg font-semibold">
           <span>Total:</span>
-          <span className="gradient-text">{calculateTotal()} JOD</span>
+          <span className="gradient-text">{product?.price} JOD</span>
         </div>
         <div className="flex justify-between items-center text-lg font-semibold">
-          <span>City Fee:</span>
+          <span>Delivery Fee:</span>
           <span className="gradient-text">
             {watch('deliveryInfo.cityFee')} JOD
           </span>
@@ -126,7 +130,7 @@ function Step5Summary() {
         <div className="flex justify-between items-center text-lg font-semibold">
           <span>Final Total:</span>
           <span className="gradient-text">
-            {calculateTotal() + watch('deliveryInfo.cityFee')} JOD
+            {product?.price + watch('deliveryInfo.cityFee')} JOD
           </span>
         </div>
       </div>

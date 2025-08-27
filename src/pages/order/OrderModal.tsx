@@ -46,9 +46,15 @@ interface OrderModalProps {
   isOpen: boolean;
   onClose: () => void;
   selectedColor: string;
+  product: any;
 }
 
-const OrderModal = ({ isOpen, onClose, selectedColor }: OrderModalProps) => {
+const OrderModal = ({
+  isOpen,
+  onClose,
+  selectedColor,
+  product,
+}: OrderModalProps) => {
   const [currentStep, setCurrentStep] = useState(1);
   const defaultValues = {
     personalInfo: {
@@ -201,7 +207,7 @@ const OrderModal = ({ isOpen, onClose, selectedColor }: OrderModalProps) => {
       const formData = new FormData();
 
       // Required: Product ID
-      formData.append('product', '689f857545ca4e292e013f13');
+      formData.append('product', product._id);
 
       // Step 1: Personal Information
       if (data.personalInfo) {
@@ -230,10 +236,24 @@ const OrderModal = ({ isOpen, onClose, selectedColor }: OrderModalProps) => {
         }
 
         formData.append('personalInfo[email]', data.personalInfo.email || '');
+
+        if (data.personalInfo?.businessEmail) {
+          formData.append(
+            'personalInfo[businessEmail]',
+            data.personalInfo.businessEmail
+          );
+        }
+
         if (data.personalInfo.linkedinUrl) {
           formData.append(
             'personalInfo[linkedinUrl]',
             data.personalInfo.linkedinUrl
+          );
+        }
+        if (data.personalInfo?.instagramUrl) {
+          formData.append(
+            'personalInfo[instagramUrl]',
+            data.personalInfo.instagramUrl
           );
         }
       }
@@ -249,6 +269,7 @@ const OrderModal = ({ isOpen, onClose, selectedColor }: OrderModalProps) => {
           'cardDesign[includePrintedLogo]',
           (data.cardDesign.includePrintedLogo || false).toString()
         );
+        console.log('data.cardDesign.companyLogo', data.cardDesign.companyLogo);
         if (data.cardDesign.companyLogo) {
           formData.append('companyLogo', data.cardDesign.companyLogo);
         }
@@ -283,17 +304,21 @@ const OrderModal = ({ isOpen, onClose, selectedColor }: OrderModalProps) => {
           'deliveryInfo[deliveryEmail]',
           data.deliveryInfo.deliveryEmail || ''
         );
+        if (data.deliveryInfo?.postcode) {
+          formData.append('deliveryInfo[postcode]', data.deliveryInfo.postcode);
+        }
       }
 
       // Step 4: Payment Method
       formData.append('paymentMethod', data.paymentMethod || 'cash');
 
+      console.log('formData', formData);
       await mutate(formData);
 
       // Reset form
       methods.reset(defaultValues);
-      setCurrentStep(1);
-      onClose();
+      // setCurrentStep(1);
+      // onClose();
     } catch (error) {
       toast({
         title: 'Order Failed',
@@ -388,7 +413,7 @@ const OrderModal = ({ isOpen, onClose, selectedColor }: OrderModalProps) => {
                 {currentStep === 1 && <Step1PersosnalDet />}
 
                 {/* Step 2: Card Design */}
-                {currentStep === 2 && <Step2CardDesign />}
+                {currentStep === 2 && <Step2CardDesign product={product} />}
 
                 {/* Step 3: Delivery & Contact Info */}
                 {currentStep === 3 && <Step3Delivery />}
@@ -397,7 +422,7 @@ const OrderModal = ({ isOpen, onClose, selectedColor }: OrderModalProps) => {
                 {currentStep === 4 && <Step4Payment />}
 
                 {/* Step 5: Order Summary */}
-                {currentStep === 5 && <Step5Summary />}
+                {currentStep === 5 && <Step5Summary product={product} />}
 
                 {/* Navigation Buttons */}
                 <div className="flex justify-between pt-6 border-t border-border">

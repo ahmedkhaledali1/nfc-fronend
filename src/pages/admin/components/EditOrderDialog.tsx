@@ -347,6 +347,7 @@ const EditOrderDialog = ({ isOpen, onClose, order }: EditOrderDialogProps) => {
     },
   ];
 
+  console.log('order', order);
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -402,7 +403,9 @@ const EditOrderDialog = ({ isOpen, onClose, order }: EditOrderDialogProps) => {
                 {currentStep === 1 && <Step1PersosnalDet />}
 
                 {/* Step 2: Card Design */}
-                {currentStep === 2 && <Step2CardDesign />}
+                {currentStep === 2 && (
+                  <Step2CardDesign product={order.product} />
+                )}
 
                 {/* Step 3: Delivery & Contact Info */}
                 {currentStep === 3 && <Step3Delivery />}
@@ -411,7 +414,7 @@ const EditOrderDialog = ({ isOpen, onClose, order }: EditOrderDialogProps) => {
                 {currentStep === 4 && <Step4Payment />}
 
                 {/* Step 5: Order Summary */}
-                {currentStep === 5 && <Step5Summary />}
+                {currentStep === 5 && <Step5Summary product={order.product} />}
 
                 {/* Navigation Buttons */}
                 <div className="flex justify-between pt-6 border-t border-border">

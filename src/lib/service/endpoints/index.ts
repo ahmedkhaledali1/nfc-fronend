@@ -47,7 +47,11 @@ export function deleteTestimonial(id: string) {
 }
 
 export function PosOrder(data: any) {
-  const res = axiosInstance.post('/orders', data);
+  const res = axiosInstance.post('/orders', data, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   return res;
 }
 
