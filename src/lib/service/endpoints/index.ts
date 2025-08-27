@@ -174,7 +174,7 @@ export function updateSocialMedia(
 }
 
 export function deleteSocialMedia(id: string) {
-  const res = axiosInstance.delete(`/social-media/${id}`);
+  const res = axiosInstance.delete(`/social-media/${id}/hard-delete`);
   return res;
 }
 
