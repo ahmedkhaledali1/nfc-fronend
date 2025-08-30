@@ -381,6 +381,7 @@ const ViewOrderDialog = ({ isOpen, onClose, order }: ViewOrderDialogProps) => {
                   src={`${import.meta.env.VITE_BACKEND_DOMAIN}${
                     order.despositeTransactionImg
                   }`}
+                  crossOrigin="anonymous"
                   alt="Deposite Transaction Image"
                   className="w-24 h-24 object-cover rounded-lg"
                 />

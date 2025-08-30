@@ -115,6 +115,7 @@ function Step5Summary({ product }: { product: any }) {
                 src={`${import.meta.env.VITE_BACKEND_DOMAIN}${watch(
                   'despositeTransactionImg'
                 )}`}
+                crossOrigin="anonymous"
                 alt="Deposite Transaction Image"
                 className="w-24 h-24 object-cover rounded-lg"
               />
