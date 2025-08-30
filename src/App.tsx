@@ -12,6 +12,9 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import AdminPanel from './pages/AdminPanel';
 import NotFound from './pages/NotFound';
+import DeliveryPolicy from './pages/DeliveryPolicy';
+import CancellationPolicy from './pages/CancellationPolicy';
+import RefundPolicy from './pages/RefundPolicy';
 
 const queryClient = new QueryClient();
 
@@ -36,6 +39,12 @@ const App = () => (
             <Route path="/bulk-orders" element={<BulkOrders />} />
             <Route path="/contact-us" element={<ContactUs />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/delivery-policy" element={<DeliveryPolicy />} />
+            <Route
+              path="/cancellation-policy"
+              element={<CancellationPolicy />}
+            />
+            <Route path="/refund-policy" element={<RefundPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/admin-panel/*" element={<AdminPanel />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

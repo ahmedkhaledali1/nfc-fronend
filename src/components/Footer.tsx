@@ -183,25 +183,65 @@ const Footer = () => {
             © 2025 LinkIt Cards. All rights reserved.
           </div>
 
-          <div className="flex space-x-6 text-sm text-muted-foreground">
-            <Link
-              to="/bulk-orders"
-              className="hover:text-foreground transition-colors"
-            >
-              Bulk Orders
-            </Link>
-            <Link
-              to="/privacy-policy"
-              className="hover:text-foreground transition-colors"
-            >
-              Privacy Policy
-            </Link>
-            <Link
-              to="/terms-of-service"
-              className="hover:text-foreground transition-colors"
-            >
-              Terms of Service
-            </Link>
+          <div className="flex items-center space-x-6">
+            {/* Payment Methods */}
+            <div className="flex items-center space-x-3">
+              <span className="text-xs text-muted-foreground">We Accept:</span>
+              <div className="flex space-x-2">
+                <img src="/visa.svg" alt="Visa" className="w-12 h-8" />
+                <img
+                  src="/master-card.png"
+                  alt="MasterCard"
+                  className="w-12 h-8"
+                />
+              </div>
+            </div>
+
+            {/* Links */}
+            <div className="flex space-x-6 text-sm text-muted-foreground">
+              <Link
+                to="/bulk-orders"
+                className="hover:text-foreground transition-colors"
+              >
+                Bulk Orders
+              </Link>
+              <Link
+                to="/privacy-policy"
+                className="hover:text-foreground transition-colors"
+              >
+                Privacy Policy
+              </Link>
+              <Link
+                to="/delivery-policy"
+                className="hover:text-foreground transition-colors"
+              >
+                Delivery Policy
+              </Link>
+              <Link
+                to="/cancellation-policy"
+                className="hover:text-foreground transition-colors"
+              >
+                Cancellation Policy
+              </Link>
+              <Link
+                to="/refund-policy"
+                className="hover:text-foreground transition-colors"
+              >
+                Refund Policy
+              </Link>
+              <Link
+                to="/refund-policy"
+                className="hover:text-foreground transition-colors"
+              >
+                Refund Policy
+              </Link>
+              <Link
+                to="/terms-of-service"
+                className="hover:text-foreground transition-colors"
+              >
+                Terms of Service
+              </Link>
+            </div>
           </div>
         </div>
       </div>

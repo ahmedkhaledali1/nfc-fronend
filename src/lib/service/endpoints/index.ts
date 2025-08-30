@@ -283,3 +283,47 @@ export function updateSubscriber(id: string, data: { email: string }) {
   const res = axiosInstance.patch(`/subscribers/${id}`, data);
   return res;
 }
+
+export function getAddons() {
+  const res = axiosInstance.get('/addons');
+  return res;
+}
+
+// Addons endpoints
+export function getAddonsPaginated(currentPage: number, itemsPerPage: number) {
+  const res = axiosInstance.get(`/addons`, {
+    params: {
+      page: currentPage,
+      limit: itemsPerPage,
+    },
+  });
+  return res;
+}
+
+export function createAddon(data: {
+  title: string;
+  price: number;
+  options?: string[];
+  inputType: 'text' | 'number' | 'radio' | 'select' | 'image';
+}) {
+  const res = axiosInstance.post('/addons', data);
+  return res;
+}
+
+export function updateAddon(
+  id: string,
+  data: {
+    title: string;
+    price: number;
+    options?: string[];
+    inputType: 'text' | 'number' | 'radio' | 'select' | 'image';
+  }
+) {
+  const res = axiosInstance.patch(`/addons/${id}`, data);
+  return res;
+}
+
+export function deleteAddon(id: string) {
+  const res = axiosInstance.delete(`/addons/${id}`);
+  return res;
+}

@@ -218,8 +218,7 @@ const CitiesPage = () => {
       label: 'Delivery Fee',
       render: (city: City) => (
         <div className="flex items-center gap-1">
-          <DollarSign className="h-4 w-4 text-green-600" />
-          <span className="font-medium">${city.deliveryFee}</span>
+          <span className="font-medium">JOD {city.deliveryFee}</span>
         </div>
       ),
     },

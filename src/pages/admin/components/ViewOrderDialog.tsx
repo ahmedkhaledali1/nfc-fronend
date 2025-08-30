@@ -20,6 +20,8 @@ import {
   Phone,
   Building,
   Globe,
+  Package,
+  DollarSign,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -34,7 +36,7 @@ const ViewOrderDialog = ({ isOpen, onClose, order }: ViewOrderDialogProps) => {
   const [currentStep, setCurrentStep] = useState(1);
 
   const nextStep = () => {
-    setCurrentStep((prev) => Math.min(prev + 1, 5));
+    setCurrentStep((prev) => Math.min(prev + 1, 6));
   };
 
   const prevStep = () => {
@@ -62,12 +64,18 @@ const ViewOrderDialog = ({ isOpen, onClose, order }: ViewOrderDialogProps) => {
     },
     {
       number: 4,
+      title: 'Add-ons',
+      description: 'Additional features',
+      icon: Package,
+    },
+    {
+      number: 5,
       title: 'Payment Method',
       description: 'Payment details',
       icon: Payment,
     },
     {
-      number: 5,
+      number: 6,
       title: 'Order Summary',
       description: 'Review details',
       icon: ClipboardList,
@@ -361,6 +369,24 @@ const ViewOrderDialog = ({ isOpen, onClose, order }: ViewOrderDialogProps) => {
             </Badge>
           </div>
 
+          {order.paymentMethod === 'online' && (
+            <>
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">
+                  Deposite Transaction Image
+                </label>
+              </div>
+              <div className="flex items-center gap-2">
+                <img
+                  src={`${import.meta.env.VITE_BACKEND_DOMAIN}${
+                    order.despositeTransactionImg
+                  }`}
+                  alt="Deposite Transaction Image"
+                  className="w-24 h-24 object-cover rounded-lg"
+                />
+              </div>
+            </>
+          )}
           <div>
             <label className="text-sm font-medium text-muted-foreground">
               Order Status
@@ -403,6 +429,131 @@ const ViewOrderDialog = ({ isOpen, onClose, order }: ViewOrderDialogProps) => {
           </div>
         </div>
       </div>
+    </div>
+  );
+
+  const renderAddons = () => (
+    <div className="space-y-6">
+      {/* Selected Add-ons */}
+      {order.addons && order.addons.length > 0 ? (
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Selected Add-ons</h3>
+          <div className="grid gap-4">
+            {order.addons.map((addonItem: any, index: number) => (
+              <Card key={index} className="border-l-4 border-l-primary">
+                <CardContent className="pt-6">
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-2 flex-1">
+                      <div className="flex items-center gap-2">
+                        <Package className="h-5 w-5 text-primary" />
+                        <h4 className="font-semibold text-lg">
+                          {addonItem.addon?.title || 'Unknown Addon'}
+                        </h4>
+                      </div>
+
+                      <div className="flex items-center gap-4">
+                        <Badge variant="outline" className="capitalize">
+                          {addonItem.addon?.inputType || 'N/A'}
+                        </Badge>
+                        <div className="flex items-center gap-1">
+                          <span className="font-semibold text-green-600">
+                            {addonItem.addon?.price || 0} JOD
+                          </span>
+                        </div>
+                      </div>
+
+                      {addonItem.addonValue && (
+                        <div className="mt-3">
+                          <label className="text-sm font-medium text-muted-foreground">
+                            Selected Value:
+                          </label>
+                          {addonItem.addon?.inputType === 'image' ? (
+                            <div className="mt-2">
+                              <img
+                                src={`${import.meta.env.VITE_BACKEND_DOMAIN}${
+                                  addonItem.addonValue
+                                }`}
+                                alt="Addon Image"
+                                className="max-w-48 max-h-48 object-contain border rounded-lg"
+                                crossOrigin="anonymous"
+                              />
+                            </div>
+                          ) : (
+                            <p className="text-base font-medium">
+                              {addonItem.addonValue}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="text-center py-8">
+          <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-muted-foreground">
+            No Add-ons Selected
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            This order doesn't include any additional add-ons or customizations.
+          </p>
+        </div>
+      )}
+
+      {/* Additional Images */}
+      {order.addonImages && order.addonImages.length > 0 && (
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Additional Images</h3>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {order.addonImages.map((image: string, index: number) => (
+              <Card key={index}>
+                <CardContent className="pt-6">
+                  <img
+                    src={`${import.meta.env.VITE_BACKEND_DOMAIN}${image}`}
+                    alt={`Additional Image ${index + 1}`}
+                    className="w-full h-48 object-cover rounded-lg"
+                    crossOrigin="anonymous"
+                  />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Add-ons Summary */}
+      {order.addons && order.addons.length > 0 && (
+        <Card className="bg-muted/50">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-semibold">Add-ons Summary</h4>
+                <p className="text-sm text-muted-foreground">
+                  {order.addons.length} addon
+                  {order.addons.length !== 1 ? 's' : ''} selected
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-muted-foreground">
+                  Total Add-ons Cost
+                </p>
+                <p className="text-xl font-bold text-primary">
+                  {order.addons.reduce(
+                    (total: number, addon: any) =>
+                      total + (addon.addon?.price || 0),
+                    0
+                  )}{' '}
+                  JOD
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 
@@ -576,11 +727,14 @@ const ViewOrderDialog = ({ isOpen, onClose, order }: ViewOrderDialogProps) => {
             {/* Step 3: Delivery & Contact Info */}
             {currentStep === 3 && renderDeliveryInfo()}
 
-            {/* Step 4: Payment Method */}
-            {currentStep === 4 && renderPaymentMethod()}
+            {/* Step 4: Add-ons */}
+            {currentStep === 4 && renderAddons()}
 
-            {/* Step 5: Order Summary */}
-            {currentStep === 5 && renderOrderSummary()}
+            {/* Step 5: Payment Method */}
+            {currentStep === 5 && renderPaymentMethod()}
+
+            {/* Step 6: Order Summary */}
+            {currentStep === 6 && renderOrderSummary()}
 
             {/* Navigation Buttons */}
             <div className="flex justify-between pt-6 border-t border-border">
@@ -594,7 +748,7 @@ const ViewOrderDialog = ({ isOpen, onClose, order }: ViewOrderDialogProps) => {
                 Previous
               </Button>
 
-              {currentStep < 5 ? (
+              {currentStep < 6 ? (
                 <Button
                   onClick={nextStep}
                   className="btn-hero flex items-center"

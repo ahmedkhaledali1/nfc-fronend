@@ -31,7 +31,7 @@ function Step3Delivery() {
     if (selectedCountry) {
       setValue('deliveryInfo.city', '');
     }
-  }, [selectedCountry, setValue]);
+  }, [selectedCountry]);
 
   useEffect(() => {
     if (watch('deliveryInfo.city')) {

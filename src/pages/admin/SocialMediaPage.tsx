@@ -80,7 +80,7 @@ const SocialMediaPage = () => {
     },
   });
 
-  console.log(form.formState.errors);
+  console.log('form.formState.errors...', form.formState.errors);
   const {
     data: socialMediaData,
     isLoading,
@@ -405,7 +405,12 @@ const SocialMediaPage = () => {
                     </div>
                   </div>
                   <div className="flex justify-between">
-                    <Dialog>
+                    <Dialog
+                      open={!!editingItem}
+                      onOpenChange={() =>
+                        editingItem ? setEditingItem(null) : null
+                      }
+                    >
                       <DialogTrigger asChild>
                         <Button
                           variant="outline"
@@ -462,14 +467,11 @@ const SocialMediaPage = () => {
                               >
                                 Cancel
                               </Button>
-                              <Button
-                                type="submit"
-                                disabled={updateMutation.isPending}
-                              >
+                              <SubmitButton disabled={updateMutation.isPending}>
                                 {updateMutation.isPending
                                   ? 'Updating...'
                                   : 'Update'}
-                              </Button>
+                              </SubmitButton>
                             </DialogFooter>
                           </form>
                         </Form>

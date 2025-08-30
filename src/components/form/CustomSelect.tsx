@@ -32,6 +32,7 @@ function CustomSelect({
 }) {
   const {
     setValue,
+    clearErrors,
     watch,
     formState: { errors },
   } = useFormContext();
@@ -43,7 +44,10 @@ function CustomSelect({
       </Label>
       <Select
         value={watch(name)}
-        onValueChange={(value) => setValue(name, value)}
+        onValueChange={(value) => {
+          setValue(name, value);
+          clearErrors(name);
+        }}
         disabled={disabled}
       >
         <SelectTrigger>

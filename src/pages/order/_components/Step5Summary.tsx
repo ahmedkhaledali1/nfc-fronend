@@ -6,19 +6,6 @@ import { useFormContext } from 'react-hook-form';
 function Step5Summary({ product }: { product: any }) {
   const { watch, formState } = useFormContext();
 
-  const { data: countriesData, isLoading: countriesLoading } = useQuery({
-    queryKey: ['getCountries'],
-    queryFn: () => getCountries(1, 1000),
-  });
-
-  const countries = countriesData?.data?.data?.data || [];
-
-  const calculateTotal = () => {
-    let total = 35;
-    if (watch('cardDesign.includePrintedLogo')) total += 5;
-    return total;
-  };
-  console.log('watch', watch());
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -113,7 +100,27 @@ function Step5Summary({ product }: { product: any }) {
 
       <div>
         <h4 className="font-semibold mb-3">Payment Method</h4>
-        <p className="text-sm text-muted-foreground">Cash on Delivery</p>
+        <p className="text-sm text-muted-foreground">
+          {watch('paymentMethod') === 'cash'
+            ? 'Cash on Delivery'
+            : 'Online Payment'}
+        </p>
+        {watch('paymentMethod') === 'online' && (
+          <div className="text-sm text-muted-foreground">
+            <span className="text-muted-foreground">
+              Deposite Transaction Image:
+            </span>{' '}
+            {watch('despositeTransactionImg') && (
+              <img
+                src={`${import.meta.env.VITE_BACKEND_DOMAIN}${watch(
+                  'despositeTransactionImg'
+                )}`}
+                alt="Deposite Transaction Image"
+                className="w-24 h-24 object-cover rounded-lg"
+              />
+            )}
+          </div>
+        )}
       </div>
 
       <div className="border-t border-border pt-4">
@@ -127,10 +134,29 @@ function Step5Summary({ product }: { product: any }) {
             {watch('deliveryInfo.cityFee')} JOD
           </span>
         </div>
+
+        {watch('addons').length > 0 && (
+          <div className="flex justify-between items-center text-lg font-semibold">
+            <span>Add-ons:</span>
+            <span className="gradient-text">
+              {watch('addons').reduce(
+                (total: number, addon: any) => total + addon.price,
+                0
+              )}{' '}
+              JOD
+            </span>
+          </div>
+        )}
         <div className="flex justify-between items-center text-lg font-semibold">
           <span>Final Total:</span>
           <span className="gradient-text">
-            {product?.price + watch('deliveryInfo.cityFee')} JOD
+            {product?.price +
+              watch('deliveryInfo.cityFee') +
+              watch('addons').reduce(
+                (total: number, addon: any) => total + addon.price,
+                0
+              )}{' '}
+            JOD
           </span>
         </div>
       </div>

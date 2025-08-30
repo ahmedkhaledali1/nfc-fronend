@@ -27,6 +27,10 @@ export const orderFormSchema = z.object({
     color: z.string(),
   }),
 
+  // Addons (Step 3)
+  addons: z.array(z.any()),
+  addonImages: z.array(z.any()),
+
   // Delivery (Step 3)
 
   deliveryInfo: z.object({
@@ -44,4 +48,5 @@ export const orderFormSchema = z.object({
 
   // Product & Payment
   paymentMethod: z.string(),
+  despositeTransactionImg: z.any().optional(),
 });

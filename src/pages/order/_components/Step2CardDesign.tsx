@@ -32,13 +32,15 @@ function Step2CardDesign({ product }: { product: any }) {
           required={true}
           options={product?.cardDesigns?.map((design: any) => ({
             value: design.color,
-            label: design.color,
-            description: design.color,
+
             icon: (
-              <div
-                className="w-6 h-6 rounded-full border-2 border-border"
-                style={{ backgroundColor: design.color }}
-              />
+              <div className="flex items-end flex-col justify-end gap-2">
+                <div
+                  className="w-6 h-6 rounded-full border-2 border-border"
+                  style={{ backgroundColor: design.color }}
+                />
+                <div>{design.color}</div>
+              </div>
             ),
           }))}
         />

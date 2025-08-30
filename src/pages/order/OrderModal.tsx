@@ -23,6 +23,7 @@ import {
   MapPin,
   CreditCard as Payment,
   ClipboardList,
+  ShoppingCart,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -39,6 +40,7 @@ import axiosInstance from '@/lib/service/axios';
 import SubmitButton from '@/components/ui/SubmitButton';
 import { getTopLevelFields, getStepValues, validationStep } from '@/lib/utils';
 import { PosOrder } from '@/lib/service/endpoints';
+import Step4Addons from './_components/Step4Addons';
 
 type OrderFormData = z.infer<typeof orderFormSchema>;
 
@@ -73,6 +75,8 @@ const OrderModal = ({
       includePrintedLogo: false,
       color: 'black',
     },
+    addons: [],
+    addonImages: [],
     deliveryInfo: {
       country: '',
       city: '',
@@ -107,6 +111,7 @@ const OrderModal = ({
     handleSubmit,
     watch,
     setValue,
+    setError,
     formState: { isSubmitting, errors },
   } = methods;
   const { toast } = useToast();
@@ -129,7 +134,8 @@ const OrderModal = ({
         'cardDesign.includePrintedLogo',
         'cardDesign.companyLogo',
       ],
-      3: [
+      3: ['addons', 'addons.addonImages'],
+      4: [
         'deliveryInfo.country',
         'deliveryInfo.city',
         'deliveryInfo.addressLine1',
@@ -138,8 +144,8 @@ const OrderModal = ({
         'deliveryInfo.deliveryPhone',
         'deliveryInfo.deliveryEmail',
       ],
-      4: ['paymentMethod'],
-      5: [], // Summary step doesn't need validation
+      5: ['paymentMethod', 'despositeTransactionImg'],
+      6: [], // Summary step doesn't need validation
     };
 
     const fieldNames = stepFields[step as keyof typeof stepFields] || [];
@@ -186,7 +192,18 @@ const OrderModal = ({
         );
         setValue('deliveryInfo.deliveryEmail', watch('personalInfo.email'));
       }
-      setCurrentStep((prev) => Math.min(prev + 1, 5));
+      if (
+        currentStep === 5 &&
+        watch('paymentMethod') === 'online' &&
+        !watch('despositeTransactionImg')
+      ) {
+        setError('despositeTransactionImg', {
+          message: 'Deposite transaction image is required',
+          type: 'manual',
+        });
+        return;
+      }
+      setCurrentStep((prev) => Math.min(prev + 1, 6));
     } else {
       toast({
         title: 'Validation Error',
@@ -201,7 +218,7 @@ const OrderModal = ({
     setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
 
-  const onSubmit = async (data: OrderFormData) => {
+  const onSubmit = async (data: any) => {
     console.log('form data:', data);
     try {
       const formData = new FormData();
@@ -269,9 +286,32 @@ const OrderModal = ({
           'cardDesign[includePrintedLogo]',
           (data.cardDesign.includePrintedLogo || false).toString()
         );
-        console.log('data.cardDesign.companyLogo', data.cardDesign.companyLogo);
         if (data.cardDesign.companyLogo) {
           formData.append('companyLogo', data.cardDesign.companyLogo);
+        }
+      }
+      // console.log('data.cardDesign.companyLogo', data.cardDesign.companyLogo);
+
+      // Step 3: Addons
+      if (data.addons) {
+        data.addons.forEach((addon, index) => {
+          formData.append(`addons[${index}][addon]`, addon.addon);
+          if (addon.addonValue instanceof File) {
+            formData.append(
+              `addons[${index}][addonValue]`,
+              addon.addonValue?.name
+            );
+            formData.append(`addons[${index}][inputType]`, addon.inputType);
+          } else {
+            formData.append(`addons[${index}][addonValue]`, addon.addonValue);
+            formData.append(`addons[${index}][inputType]`, addon.inputType);
+          }
+        });
+
+        if (data.addonImages) {
+          data.addonImages.forEach((image) => {
+            formData.append('addonImages', image);
+          });
         }
       }
 
@@ -311,12 +351,18 @@ const OrderModal = ({
 
       // Step 4: Payment Method
       formData.append('paymentMethod', data.paymentMethod || 'cash');
+      if (data.despositeTransactionImg) {
+        formData.append(
+          'despositeTransactionImg',
+          data.despositeTransactionImg
+        );
+      }
 
       console.log('formData', formData);
       await mutate(formData);
 
       // Reset form
-      methods.reset(defaultValues);
+      // methods.reset(defaultValues);
       // setCurrentStep(1);
       // onClose();
     } catch (error) {
@@ -343,18 +389,26 @@ const OrderModal = ({
     },
     {
       number: 3,
+      title: 'Addons',
+      description: 'Choose your addons',
+      icon: ShoppingCart,
+    },
+    {
+      number: 4,
       title: 'Delivery Info',
       description: 'Where to send your card',
       icon: MapPin,
     },
+
     {
-      number: 4,
+      number: 5,
       title: 'Payment Method',
       description: "How you'll pay",
       icon: Payment,
     },
+
     {
-      number: 5,
+      number: 6,
       title: 'Order Summary',
       description: 'Review your order',
       icon: ClipboardList,
@@ -416,13 +470,16 @@ const OrderModal = ({
                 {currentStep === 2 && <Step2CardDesign product={product} />}
 
                 {/* Step 3: Delivery & Contact Info */}
-                {currentStep === 3 && <Step3Delivery />}
+                {currentStep === 3 && <Step4Addons product={product} />}
 
                 {/* Step 4: Payment Method */}
-                {currentStep === 4 && <Step4Payment />}
+                {currentStep === 4 && <Step3Delivery />}
+
+                {/* Step 5: Payment Method */}
+                {currentStep === 5 && <Step4Payment />}
 
                 {/* Step 5: Order Summary */}
-                {currentStep === 5 && <Step5Summary product={product} />}
+                {currentStep === 6 && <Step5Summary product={product} />}
 
                 {/* Navigation Buttons */}
                 <div className="flex justify-between pt-6 border-t border-border">
@@ -436,7 +493,7 @@ const OrderModal = ({
                     Previous
                   </Button>
 
-                  {currentStep < 5 ? (
+                  {currentStep < 6 ? (
                     <Button
                       onClick={() => nextStep()}
                       className="btn-hero flex items-center"
